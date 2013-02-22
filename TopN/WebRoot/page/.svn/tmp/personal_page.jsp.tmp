@@ -1,0 +1,63 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<%@ include file="/page/util/common.jsp"%>
+<head>
+<meta content="zh-cn" http-equiv="Content-Language" />
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type" /> 
+<title>This is the navigation</title>
+ 	<link  rel="Stylesheet" type="text/css" href="../styles/personal_page.css" />
+	 <link  rel="Stylesheet" type="text/css" href="../styles/person_album.css"/>
+	  
+    <script type="text/javascript" src="../scripts/jquery-1.4.1.js" ></script>
+    <script type="text/javascript" src="../scripts/personal_page.js" ></script>
+</head>
+<body >
+	<div id="header" class="header"  style=" width:1000px;margin:10px auto auto auto; padding:auto auto auto auto;">
+        <img src="../pictures/topic3.png"  />
+    </div>
+	<div id="mainCotent" >
+        <div class="radius_top_div"> 
+       </div>
+		<div id="top_div" class="top_div">
+           <div id="img_div" class="img_div">
+              <img  id="photo_img" class="photo_img" 
+                   src="../pictures/0769b7debad16047ccbf1ab7.jpg" />
+           </div>
+           <div class="top_right_div">
+            <div class="mood_div">
+               <h4 class="mood_h4">给我留言</h4>
+               <li >
+                    <div style="float:left;">
+                        <textarea id="TextArea1" style="height:60px;width:240px; font-size:12px;"></textarea>
+                    </div>
+                    <div style="float:left; height:40px; vertical-align:middle;">
+                        <input class="btn_submit" type="button"  />
+                    </div>                    
+               </li>
+            </div>
+          </div>	  
+         </div>
+        <div class="radius_bottom_div"> 
+       </div>	  
+		<div id="info_div" class="info_div">  
+            <div  style="width:200px;float:left;">
+              <li style="padding-top:0px;"><img  src="../pictures/buttons.png" border="0" usemap="#Map"/>
+					<map name="Map" id="Map">
+					  <area shape="rect" coords="2,1,165,44" href="basicinfo.htm" target="info_main_frame" />
+					<area shape="rect" coords="3,46,165,95"  onclick="loadBaseInfo()"/>
+					<area shape="rect" coords="0,95,164,142" href="#"  onclick="loadUploadPhoto();"/>
+					<area shape="rect" coords="0,143,168,191" href="#" onclick="loadPersonlAlbum()"/>
+					</map>		
+				</li>
+            </div>
+            <div class="radius_top_small_div"></div>
+            <div id="info_main_div" >
+                
+            </div> 
+            <div class="radius_bottom_small_div"></div> 
+       </div> 
+    </div>       	
+</body>
+</html>
+

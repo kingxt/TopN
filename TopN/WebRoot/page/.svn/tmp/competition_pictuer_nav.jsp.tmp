@@ -1,0 +1,241 @@
+﻿
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+
+<%@ include file="/page/util/common.jsp"%>
+<html>
+	<head>
+		<title>剪裁参赛照片</title>
+		<link href="../styles/uploadPortrait/jquery.Jcrop.css" type="text/css"
+			rel="Stylesheet" />
+			<link type="text/css" rel="Stylesheet"
+			href="../styles/topn.css" />
+		
+		<script type="text/javascript" src="../scripts/topn.jquery-1.4.1.js"></script>
+		<script type="text/javascript" src="../scripts/topn.common.js" ></script>
+		<script type="text/javascript"
+			src="../scripts/uploadPortrait/jquery.form.js"></script>
+		<script type="text/javascript" src="../scripts/topn.showbox.js"></script>
+
+		<script type="text/javascript"
+			src="../scripts/uploadPortrait/jquery.Jcrop.min.js"></script>
+		<script type="text/javascript"
+			src="../scripts/uploadPortrait/jQuery.UtrialAvatarCutter.js"></script>
+		<script type="text/javascript">
+			
+				var width='<s:property value="#photo.width"/>';
+				var height='<s:property value="#photo.height"/>';
+				var isLocal='<s:property value="#isLocal"/>';
+      var cutter = new jQuery.UtrialAvatarCutter(
+      {
+      content : "image",
+
+      //缩略图配置,ID:所在容器ID;width,height:缩略图大小
+
+      purviews : [{id:"ImageIcon",width:380,height:450}],
+
+      //选择器默认大小
+
+      selector : {width:380,height:450},
+
+      Fixed:{fixedWidth:15,fixedHeight:12}
+      });
+
+      $(document).ready(function(){
+      	setTip("second_tip_div");
+		if(isLocal==1)
+		{
+		  cutter.reload("../"+$("#imgUrl").val(),width,height,0.8);
+    	  cutter.init();
+		}
+		else
+		{
+		isLocal=2;
+		$("#mainContent").css("display","none");
+     	 $("#Step2Container").css("display","inline-block");
+		}
+     
+		
+      });
+
+      function onSubmit()
+      {		
+	      var data = cutter.submit();
+	      $.ajax({
+		      type : "post",
+		      url : 'cutCompetitionPictuer.action',
+		      cache : true,
+		      dataType:'json',
+		      'data' : {x:data.x,y:data.y,
+		      imgUrl:$("#imgUrl").val(),zoomWidth:data.zoomWidth,zoomHeight:data.zoomHeight,isLocal:isLocal
+		      },
+		      error : function() {
+		     	 alert('加载页面时出错！');
+		      },
+		      success : function(data) {			
+			      var json = eval('(' + data.imgUrl + ')');
+			      $("#newImage").attr("src","../"+json.imgUrl);			
+			      $("#mainContent").css("display","none");
+			      $("#success").css("display","block");
+			      $("#Step2Container").css("display","inline-block");
+		      }
+	      });
+      }
+
+      $(document).ready(function () {
+      	  resolvePngInIe6();
+	      $(".friend_list_ul > li >ul >li >a").click(function () {
+	      $(this).parents("ul ").first().find("ul").toggle();
+	      // initialize2($(".friend_list_ul"), $(".friend_list_div"));
+	      });
+	      $(".left_menu_ul > li >  ul > li").click(function () {
+	      $(this).parents("ul ").first().find("ul").toggle();
+	      });
+      });
+      function uploadImg() {
+   
+      showBox(".upload_img_div", "上传参赛照", true);
+      $('#form').ajaxForm({
+		    url: 'uploadTempPhoto.action',
+		    type: 'post',
+		    dataType: 'json',
+		    resetForm:'true',
+		    'success': function (data) {
+		    	var json = eval('(' + data.imgInfo + ')');
+			    if(!json)
+			    {
+			    	alert("文件过大");
+			    }
+			    else
+			    {			    
+				    isLocal=2;				    	
+				    cutter.reload("../temp/" + json.imgUrl, json.imgWidth, json.imgHeight,0.844);
+				 	$("#imgUrl").val(json.imgUrl);				 	
+					$("#Step2Container").css("display","none");
+					$("#mainContent").css("display","inline-block");			  
+				    closeBox();
+			    }		
+		    }
+	    });
+      }
+        	
+		   function checkurl()
+		{
+		var passfix= new Array("jpg","gif","png","jpeg");
+		var strs=document.getElementById("photo");
+		
+		var maxsize=4;
+		with(strs)     //用js 的 with
+		{
+		    var filename = value.substring(value.lastIndexOf('\\')+1,value.lastIndexOf('.'));
+		   
+		    var sign = false;
+		    if(filename==null||filename=="")
+		    {
+		     alert("请选择您要上传的文件！");
+		     return false;
+		    }
+		   
+		    fix=value.substring(value.lastIndexOf('.')+1,value.length).toLowerCase();
+		    for(var i=0;i<passfix.length;i++)
+		    {
+		     if(passfix[i]==fix)
+		     {
+		      sign=true;
+		      break;
+		     }
+		    }
+		   if(!sign)
+		   {
+		    alert(fix+"为不允许上传的类型！正确类型包括（jpg,gif,png,jpeg）");
+		    return false;
+		   }
+		
+		}
+		return true;
+		}
+		
+    </script>
+	</head>
+	<body>
+
+		<!--左边内容结束始-->
+		<!--右边内容开始-->
+		<div id="mainContent" class="right_container_div">
+			<!--三层模式-->
+			<!--中间内容显示开始-->
+			<div class="tailor_introduce_div">
+				<p>
+					图片裁剪介绍:左边为最终效果图，右边为裁剪部分图,选择好了 请按确定。
+				</p>
+			</div>
+			<div class="img_tailor_div">
+				<div id="ImageIcon"></div>
+
+			</div>
+			<div class="original_img_div">
+				<div id="image" class="original_img_center_div">
+				</div>
+				<div class="trialor_operation_div">
+					<span> <input type="button" onclick="onSubmit()"
+							name="submit" class="submit_button" /> </span>
+					<span> <input type="button" name="submit"
+							class="cancel_button" onclick="uploadImg();" /> </span>
+				</div>
+			</div>
+			<div>
+				<div id="uploadcontainer" class="upload_img_div">
+					<form id="form" name="form" enctype="multipart/form-data"
+						onsubmit="return checkurl();">
+						<div class="uploadtooltip">
+							请选择新的照片文件，文件需小于2.5MB
+						</div>
+						<div class="select_img_idv">
+
+							<input type="file" name="photo" id="photo" title="选择照片" />
+
+						</div>
+						<div class="upload_div">
+							<input type="submit" name="btnUpload" value="上 传" id="btnUpload" />
+						</div>
+					</form>
+				</div>
+				<script>
+             // initializeElement($(".right_container_div"));
+            </script>
+			</div>
+		</div>
+		<div id="Step2Container" class="right_container_div"
+			style="display: none;">
+			<div align="left">
+				<input id="uploadLocal" onclick="uploadImg()" type="button"
+					class="upload_com_pic">
+
+			</div>
+			<div id="success" style="display: none; font-size: 12">
+				<div style="width: 380px; float: left;">
+					<img id="newImage"></img>
+				</div>
+				<div style="width: 300px; float: left; margin: 100px 0 0 20px;">
+					<p>
+						上传参赛照成功，请等待管理员审核！
+					</p>
+					<br>
+					<p>
+						<script type="text/javascript">
+							function go2topn(){
+								window.close();
+								window.opener.location="/TopN/totopn.action";
+							}
+						</script>
+						<a href="#" onclick="go2topn()" style="font-size: 14; ">去 <span style="font-weight: bold">TopN</span> 看看吧</a>
+					</p>
+				</div>
+ 
+			</div>
+		</div>
+
+		<input id="imgUrl" type="hidden"
+			value='<s:property value="#photo.url"/>' />
+	</body>
+</html>

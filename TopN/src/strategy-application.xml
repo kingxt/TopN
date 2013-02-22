@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 此文件用来配置一些需要依赖注入的类 -->
+
+<beans>
+	<!-- 策略类配置 -->
+	<bean id="flexService" class="com.topn.flex.FlexServiceImpl" byType="singleton">
+	</bean>
+</beans>

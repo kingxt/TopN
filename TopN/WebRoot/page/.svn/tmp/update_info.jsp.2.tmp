@@ -1,0 +1,215 @@
+﻿
+<%@ include file="/page/util/common.jsp"%>
+<link type="text/css" rel="Stylesheet" href="../styles/update_info.css" />
+<link href="../styles/jquery.datepick.css" rel="stylesheet" type="text/css" />
+<script language="javascript" type="text/javascript" src="../scripts/jquery.datepick.js"></script>
+<script language="javascript" type="text/javascript" src="../scripts/jquery.datepick-zh-CN.js"></script>
+<script language="javascript" type="text/javascript" src="../scripts/jquery.swfobject.1-1-1.min.js"></script>
+<script>
+              $(document).ready(function () {
+              	resetUpdatePage();
+              	$('#birthday').datepick({dateFormat: 'yy-mm-dd'}); 
+               
+                  $(".info_select_div > ul >li").each(function (index) {
+                      $(this).click(function () {
+                          $("div.show_div").removeClass("show_div");
+                          $("div.update_info_div").eq(index).addClass("show_div");
+                      });
+                  });
+              });
+          </script>
+<div id="update_div" class="update_div">
+	 <div class="info_select_div">
+                   <ul class="info_select_ul">
+                     <li>
+                              <a class="menu_a" onclick="updateBaseInfoInput()">基本信息</a>
+                     </li>
+                       <li>
+                            <a class="menu_a" onclick="loadHobbyType()">兴趣信息</a>
+                     </li>
+                      <li>
+                            <a class="menu_a" onclick="loadEducation()">教育信息</a>
+                     </li>
+                     <li>
+                            <a class="menu_a" onclick="loadUploadHeadPortrait()">个人头像</a>
+                     </li>
+                     <li>
+                            <a class="menu_a" onclick="modifyPassword()">修改密码</a>
+                     </li>
+                   </ul>
+              </div>
+
+	<div id="info_div" class="show_div update_info_div">
+		<form id="updateForm" action="page/updatePersonalInfo.action"
+			method="post">
+			<div>
+				<div class="basic_info_div">
+					<ul class="info_update_ul">
+						<ul class="info_top_ul">
+
+							<li>
+
+								<ul>
+									<li>
+										&nbsp;&nbsp;&nbsp;&nbsp;姓名：
+										<input name="pi.nickName" type="text"
+											value="<s:property value="#pi.nickName"/>" />
+									</li>
+									<li>
+										&nbsp;&nbsp;&nbsp;&nbsp;性别：
+										<select name="pi.sex">
+											<option value="1"
+												"<s:if test="#pi.sex==1">selected</s:if>">
+												男
+											</option>
+											<option value="2"
+												"<s:if test="#pi.sex==2">selected</s:if>">
+												女
+											</option>
+										</select>
+									</li>
+									<li>
+										&nbsp;&nbsp;&nbsp;&nbsp;职业：
+										<input name="pi.job" type="text"
+											value="<s:property value="#pi.job"/>" />
+									</li>
+									<li>
+										<p style="vertical-align: top;">
+											个人简介：
+										</p>
+										<textarea name="pi.ps" id="TextArea1" class="introduce_are"><s:property value="#pi.ps" /></textarea>
+
+									</li>
+
+								</ul>
+							</li>
+						</ul>
+					</ul>
+				</div>
+				<ul class="info_ul">
+					<h5>
+						&nbsp;&nbsp;&nbsp;隐私信息
+						<font color="red">*</font>是否保密
+					</h5>
+
+					<ul class="private_ul">
+						<li>
+							&nbsp;&nbsp;&nbsp;&nbsp;生日：
+							<input  name="pi.birthday" type="text" id="birthday" value="<s:property value="#pi.birthday"/>"/>
+							<select name="per.perBirthday">
+								<option value="1"
+									<s:if test="#per.perBirthday == 1">selected</s:if>>
+									公开
+								</option>
+								<option value="2"
+									<s:if test="#per.perBirthday == 2">selected</s:if>>
+									好友可见
+								</option>
+								<option value="3"
+									<s:if test="#per.perBirthday == 3">selected</s:if>>
+									保密
+								</option>
+							</select>	
+						</li>
+						<li>
+							&nbsp;&nbsp;&nbsp;&nbsp;电话：
+							<input name="pi.phone" type="text"
+								value="<s:property value="#pi.phone"/>" />
+							<select name="per.perPhone">
+								<option value="1" <s:if test="#per.perPhone == 1">selected</s:if>>
+									公开
+								</option>
+								<option value="2" <s:if test="#per.perPhone == 2">selected</s:if>>
+									好友可见
+								</option>
+								<option value="3" <s:if test="#per.perPhone == 3">selected</s:if>>
+									保密
+								</option>
+							</select>
+						</li>
+						<li>
+							&nbsp;&nbsp;&nbsp;&nbsp;地址：
+							<input name="pi.address" type="text"
+								value="<s:property value="#pi.address"/>" />
+							<select name="per.perAddress">
+								<option value="1"
+									<s:if test="#per.perAddress == 1">selected</s:if>>
+									公开
+								</option>
+								<option value="2"
+									<s:if test="#per.perAddress == 2">selected</s:if>>
+									好友可见
+								</option>
+								<option value="3"
+									<s:if test="#per.perAddress == 3">selected</s:if>>
+									保密
+								</option>
+							</select>
+						</li>
+						<li>
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MSN：
+							<input name="pi.msn" type="text"
+								value="<s:property value="#pi.msn"/>" />
+							<select name="per.perMsn">
+								<option value="1" <s:if test="#per.perMsn == 1">selected</s:if>>
+									公开
+								</option>
+								<option value="2" <s:if test="#per.perMsn == 2">selected</s:if>>
+									好友可见
+								</option>
+								<option value="3" <s:if test="#per.perMsn == 3">selected</s:if>>
+									保密
+								</option>
+							</select>
+						</li>
+						<li>
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Q Q：
+							<input name="pi.qq" type="text"
+								value="<s:property value="#pi.qq"/>" />
+							<select name="per.perQQ">
+								<option value="1" <s:if test="#per.perQQ == 1">selected</s:if>>
+									公开
+								</option>
+								<option value="2" <s:if test="#per.perQQ == 2">selected</s:if>>
+									好友可见
+								</option>
+								<option value="3" <s:if test="#per.perQQ == 3">selected</s:if>>
+									保密
+								</option>
+							</select>
+						</li>
+					</ul>
+				</ul>
+			</div>
+		</form>
+	</div>
+
+	<div class="update_info_div" id="hobby">
+		<!-- 异步加载  兴趣类型 -->
+	</div>
+	<div class="update_info_div" id="education_div">
+		<!-- 异步加载教育类型 -->
+	</div>
+	<div class="update_info_div">
+		<div class="upload_headPortrait_div" id="upload_headPortrait_div">
+			<!-- 异步加载上传头像 -->
+		</div>
+	</div>
+	<div class="update_info_div" id="modify_pwd_div">
+               
+    </div>
+	
+	<div>
+		<ul class="submit_div">
+			<li>
+				<input id="update" type="button" class="submit_button"
+					onclick="updatePersonalInfo()" />
+
+			</li>
+		</ul>
+	</div>
+</div>
+<br />
+
+
+

@@ -1,0 +1,424 @@
+package com.topn.controller;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
+
+import com.topn.DAL.EntryFormDAL;
+import com.topn.DAL.query.EntryFormQuery;
+import com.topn.asynchronous.AsynchPool;
+import com.topn.bean.EntryForm;
+import com.topn.bean.TO.RankTO;
+import com.topn.collection.MyConcurrentHashMap;
+import com.topn.collection.MyMapEntry;
+import com.topn.collection.PicturePartition;
+import com.topn.controller.help.RankStrategyHelp;
+import com.topn.task.GradeTask;
+import com.topn.task.RankingListTask;
+import com.topn.task.UpdatePicturePartitionTask;
+import com.topn.test.TestTopN;
+import com.topn.util.StringUtil;
+
+/**
+ * 
+ * 创建人 KingXt
+ * 创建时间：2011-3-2 下午07:18:16
+ * 
+ * 图片处理类，此类也用单粒模式
+ */
+public class GeneratePictureController extends ReentrantLock{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private static GeneratePictureController instance = new GeneratePictureController();
+	
+	private GeneratePictureController(){}
+	
+	public static GeneratePictureController getInstance(){
+		return instance;
+	}
+	/**
+	 * 根据制定的年龄和性别找记录
+	 * @param sex
+	 * @param age
+	 * @return
+	 */
+	public EntryForm getPictureBySexAndAge(int sex, String age){
+		MyConcurrentHashMap<Integer, EntryForm> cacheOriginal = null;
+		MyConcurrentHashMap<Integer, EntryForm> cacheReady = null;
+		MyConcurrentHashMap<Integer, EntryForm> cacheAlready = null;
+		
+		//首先判断要处理的缓存
+		if(age.equals(PicturePartition.P_0_15)){
+			cacheOriginal = PicturePartition.pp_original_0_15;
+			cacheReady = PicturePartition.pp_ready_0_15;
+			cacheAlready = PicturePartition.pp_already_0_15;
+		}else if(age.equals(PicturePartition.P_16_25)){
+			cacheOriginal = PicturePartition.pp_original_16_25;
+			cacheReady = PicturePartition.pp_ready_16_25;
+			cacheAlready = PicturePartition.pp_already_16_25;
+		}else if(age.equals(PicturePartition.P_26_35)){
+			cacheOriginal = PicturePartition.pp_original_26_35;
+			cacheReady = PicturePartition.pp_ready_26_35;
+			cacheAlready = PicturePartition.pp_already_26_35;
+		}else if(age.equals(PicturePartition.P_36_45)){
+			cacheOriginal = PicturePartition.pp_original_36_45;
+			cacheReady = PicturePartition.pp_ready_36_45;
+			cacheAlready = PicturePartition.pp_already_36_45;
+		}else if(age.equals(PicturePartition.P_46_over)){
+			cacheOriginal = PicturePartition.pp_original_46_over;
+			cacheReady = PicturePartition.pp_ready_46_over;
+			cacheAlready = PicturePartition.pp_already_46_over;
+		}
+		//从对应缓存中找符合条件的记录
+		
+		MyMapEntry<Integer, EntryForm> mee = cacheOriginal.getFirstAndRemove(sex);
+		
+		if(mee == null){
+			/*
+			 * 如果原始集合为0， 这也就代表着原始集合多被评论完了，这里有两张策略
+			 * 一： 再循环指定的此时
+			 * 二: 和数据库打交道,同步缓存,这里要注意的是没同步一次缓存都要重新排名,所以照片留在缓存中的时间不能太长
+			 * 
+			 * 这里采用第一种方式来实现：
+			 * 第一步：将ready集合中的数据和already中的数据都放到original集合中再次循环，如果有在浏览器中的数据
+			 *     是在合并集合后在评论的，那么评论查看首先是从ready中找，然后就是从original集合中找，如果两者都找不到就直接同步数据库
+			 */
+			int cacheOriginalSize = cacheOriginal.size();
+			int cacheAlreadySize = 0;
+			if(cacheOriginalSize == 0){
+				int count = PicturePartition.loop.incrementAndGet();
+					
+				//小于循环的次数
+				this.lock();
+				try{
+					if(count < PicturePartition.loopCount){
+						PicturePartition.merger(cacheReady, cacheOriginal);
+						PicturePartition.merger(cacheAlready, cacheOriginal);
+						//重置索引
+						
+					}else{
+						//达到循环次数的底限
+							/*
+							 * 第一步发出一个任务要更新集合
+							 */
+						PicturePartition.merger(cacheReady, cacheOriginal);
+						PicturePartition.merger(cacheAlready, cacheOriginal);							
+						if(AsynchPool.pictureIsArrived){
+							synchronized (this) {
+								if(AsynchPool.pictureIsArrived){
+									//添加一个更新的任务		
+									AsynchPool.getInstance().addTask(new UpdatePicturePartitionTask(sex, age));
+								
+									AsynchPool.pictureIsArrived = false;
+								}								
+							}
+						}
+					}
+				}finally{
+					this.unlock();
+				}
+				
+				MyMapEntry<Integer, EntryForm> mergeTemp = cacheOriginal.getFirstAndRemove(PicturePartition.FEMAIL == sex ? PicturePartition.FEMAIL : PicturePartition.MALE);
+				if(mergeTemp != null){
+					cacheReady.put(mergeTemp.getKey(), mergeTemp.getValue());
+TestTopN.mergerGet.incrementAndGet();
+TestTopN.fromCache.incrementAndGet();
+					return mergeTemp.getValue();
+				}
+			}
+			if((cacheAlreadySize = cacheAlready.size()) > 0){
+				//这里要处理的策略不是从数据库中找，而是从已经评论的照片中找，这是牺牲了等价概率但是提高了访问速度
+				MyMapEntry<Integer, EntryForm> meeTwice = cacheAlready.getFirstAndRemove(PicturePartition.FEMAIL == sex ? PicturePartition.FEMAIL : PicturePartition.MALE);
+				if(null != meeTwice){
+					/*
+					 * 这里要说明下为什么要这么做:
+					 * 如果评论的照片在original缓存中找不到，但是他的size大于0，说明一个问题就是有异性的照片缓存在里面
+					 * 我们要做的是，这个照片被剔除缓存
+					 */
+					if(cacheOriginalSize == 0){
+						cacheReady.put(meeTwice.getKey(), meeTwice.getValue());
+					}
+TestTopN.direckFromCacheAlready.incrementAndGet();					
+TestTopN.fromCache.incrementAndGet();
+					return meeTwice.getValue();
+				}
+			}
+			if(cacheReady.size() > 0){
+				//这里也不是从数据库中找，而是从还在评论中的照片里面找，这里也牺牲了等概率性
+				MyMapEntry<Integer, EntryForm> meeThird = cacheReady.getFirstAndRemove(PicturePartition.FEMAIL == sex ? PicturePartition.FEMAIL : PicturePartition.MALE);
+				if(null != meeThird){
+					if(cacheAlreadySize == 0 && cacheOriginalSize == 0){
+						cacheReady.put(meeThird.getKey(), meeThird.getValue());
+					}
+TestTopN.direckFromCacheReady.incrementAndGet();					
+TestTopN.fromCache.incrementAndGet();
+					return meeThird.getValue();
+				}
+			}
+				/*
+				 * 这里就没有办法了，我们只能从数据库中找了，这里应该有两件事要做
+				 * 如果给定的条件一个都没有，那么应该分配一个任务去数据库中取数据
+				 * 
+				 * 同时要更新缓存
+				 * 
+				 */
+			EntryForm ef = selectOneFromDB(age, sex);
+			if(ef != null){
+				TestTopN.direckSelect.incrementAndGet();		
+				if(AsynchPool.pictureIsArrived){
+					synchronized (this) {
+						if(AsynchPool.pictureIsArrived){
+							//添加一个更新的任务		
+							AsynchPool.getInstance().addTask(new UpdatePicturePartitionTask(sex, age));
+						
+							AsynchPool.pictureIsArrived = false;
+						}								
+					}
+				}
+				return ef;
+			}
+			
+			
+		}else{
+//System.out.println("从cacheOriginal 中获取    ");
+TestTopN.fromCache.incrementAndGet();
+			cacheReady.put(mee.getKey(), mee.getValue());
+			return mee.getValue();
+		}
+		//这里直接从数据库取一张年龄在1 到 60 的女照片
+TestTopN.direckSelect.incrementAndGet();
+		return EntryFormQuery.getInstance().selectOne(1, 60, PicturePartition.FEMAIL);
+	}
+	
+	/**
+	 * 直接从数据库中获取一张
+	 * @param age
+	 * @param sex
+	 * @return
+	 */
+	public EntryForm selectOneFromDB(String age, int sex){
+		String []ages = age.split("_");
+		if(ages.length >= 3){
+			int a1 = Integer.parseInt(ages[1]);
+			int a2 = 100;
+			if(!ages[2].equals("over")){
+				a2 = Integer.parseInt(ages[2]);
+			}
+			return EntryFormQuery.getInstance().selectOne(a1, a2, sex);
+		}
+		return null;
+	}
+	
+	/**
+	 * 拿到排名的前多少名，这里采用的策略是：
+	 * 多久刷新一次排行榜（这里的多久采用次数刷新方式，
+	 * 记录有多少人评论， 如果在一段时间内评论超过了给定的次数就刷新排行榜）
+	 * @param begin
+	 * @param end
+	 * @return
+	 */
+	public List<EntryForm> getTopN(int begin, int end, int sex){
+		List<EntryForm> rankingList = null;
+		switch(sex){
+			case 1:rankingList = PicturePartition.rankingListBoy;break;
+			case 2:rankingList = PicturePartition.rankingListGirl;break;
+			default: rankingList = PicturePartition.rankingListGirl;
+		}
+		
+		int size = rankingList.size();
+		if(size == 0){
+			//发起一个异步获取排名榜的信号
+			if(AsynchPool.rankingListIsArrived){
+				this.lock();
+				try{
+					if(AsynchPool.rankingListIsArrived){
+						AsynchPool.getInstance().addTask(new RankingListTask(sex));
+						AsynchPool.rankingListIsArrived = false;
+					}
+				}finally{
+					this.unlock();
+				}
+			}
+		}else if(size < PicturePartition.RANKING_SIZE){
+			if(AsynchPool.rankingListIsArrived){
+				this.lock();
+				try{
+					if(AsynchPool.rankingListIsArrived){
+						AsynchPool.getInstance().addTask(new RankingListTask(sex));
+						AsynchPool.rankingListIsArrived = false;
+					}
+				}finally{
+					this.unlock();
+				}
+			}
+			
+			if(size < begin){
+				return null;
+			}else{
+				int tempEnd = Math.min(end, size);
+				List<EntryForm> temp = new ArrayList<EntryForm>();
+				for(int i = begin; i < tempEnd; i++){
+					temp.add(rankingList.get(i));
+				}
+				return temp;
+			}
+		}else if(size >= PicturePartition.RANKING_SIZE){
+			//获取的排行榜不能超过最大限制
+			if(end > PicturePartition.RANKING_SIZE) end = PicturePartition.RANKING_SIZE;
+			List<EntryForm> temp = new ArrayList<EntryForm>();
+			for(int i = begin; i < end; i++){
+				temp.add(rankingList.get(i));
+			}
+			return temp;
+		}
+		return null;
+	}
+	
+
+	/**
+	 * 将前台打的分保存到集合
+	 * 这里要注意的是打分的时候也不是同步的，只是将要保存的对象异步到线程池中
+	 * @param entryId 
+	 * @param grade 大的分数
+	 * @param age 下一个要取的年龄
+	 * @param sex
+	 * @return
+	 */
+	public EntryForm saveGrade(int entryId, float grade, int thisAge, String nextAge, int nextSex) {
+		EntryForm ef = this.getPictureBySexAndAge(nextSex, nextAge);
+		//EntryFormDAL.getInstance().updateAnEntryForm(entryId, grade);
+		if(entryId > 0 && grade > 0){
+			AsynchPool.getInstance().addTask(new GradeTask(entryId, grade, PicturePartition.getStringAge(thisAge)));
+		}
+		return ef;
+	}
+	
+	/**
+	 * 将分数保存到数据库， 这个方法是异步调用的
+	 * @param entryId
+	 * @param grade
+	 * @param age
+	 * @param sex
+	 */
+	public void grade2DB(int entryId, float grade, String age){
+		MyConcurrentHashMap<Integer, EntryForm> cacheOriginal = null;
+		MyConcurrentHashMap<Integer, EntryForm> cacheReady = null;
+		MyConcurrentHashMap<Integer, EntryForm> cacheAlready = null;
+		
+		//首先判断要处理的缓存
+		if(age.equals(PicturePartition.P_0_15)){
+			cacheOriginal = PicturePartition.pp_original_0_15;
+			cacheReady = PicturePartition.pp_ready_0_15;
+			cacheAlready = PicturePartition.pp_already_0_15;
+		}else if(age.equals(PicturePartition.P_16_25)){
+			cacheOriginal = PicturePartition.pp_original_16_25;
+			cacheReady = PicturePartition.pp_ready_16_25;
+			cacheAlready = PicturePartition.pp_already_16_25;
+		}else if(age.equals(PicturePartition.P_26_35)){
+			cacheOriginal = PicturePartition.pp_original_26_35;
+			cacheReady = PicturePartition.pp_ready_26_35;
+			cacheAlready = PicturePartition.pp_already_26_35;
+		}else if(age.equals(PicturePartition.P_36_45)){
+			cacheOriginal = PicturePartition.pp_original_36_45;
+			cacheReady = PicturePartition.pp_ready_36_45;
+			cacheAlready = PicturePartition.pp_already_36_45;
+		}else if(age.equals(PicturePartition.P_46_over)){
+			cacheOriginal = PicturePartition.pp_original_46_over;
+			cacheReady = PicturePartition.pp_ready_46_over;
+			cacheAlready = PicturePartition.pp_already_46_over;
+		}
+		
+		EntryForm ef1 = cacheOriginal.remove(entryId);
+		if(ef1 != null){
+			if(TestTopN.map.containsKey(entryId)){
+				TestTopN.map.put(entryId, TestTopN.map.get(entryId) + 1);
+			}else{
+				TestTopN.map.put(entryId, 1);
+			}
+			ef1.setTimes(ef1.getTimes() + 1);
+			ef1.setTotalScore(ef1.getTotalScore() + grade);
+			ef1.setAverageScore(RankStrategyHelp.updateAGradeAndReturnMyAverage(grade, ef1.getTotalScore(), ef1.getTimes()));
+			cacheAlready.put(entryId, ef1);
+TestTopN.updateCache.incrementAndGet();			
+		}else if(ef1 == null){
+			EntryForm ef2 = cacheReady.remove(entryId);
+			if(ef2 != null){
+				if(TestTopN.map.containsKey(entryId)){
+					TestTopN.map.put(entryId, TestTopN.map.get(entryId) + 1);
+				}else{
+					TestTopN.map.put(entryId, 1);
+				}
+				ef2.setTimes(ef2.getTimes() + 1);
+				ef2.setTotalScore(ef2.getTotalScore() + grade);
+				ef2.setAverageScore(RankStrategyHelp.updateAGradeAndReturnMyAverage(grade, ef2.getTotalScore(), ef2.getTimes()));
+				cacheAlready.put(entryId, ef2);
+TestTopN.updateCache.incrementAndGet();					
+			}else{
+				//这里应该异步到数据库
+//System.out.println("直接更新到数据库");
+				if(TestTopN.map.containsKey(entryId)){
+					TestTopN.map.put(entryId, TestTopN.map.get(entryId) + 1);
+				}else{
+					TestTopN.map.put(entryId, 1);
+				}
+				TestTopN.direckUpdate.incrementAndGet();
+				
+				//下面直接更新
+				RankStrategyHelp.updateAGrade(grade);
+				EntryFormDAL.getInstance().updateAnEntryForm(entryId, grade);
+				
+			}
+		}
+		
+		
+	}
+	
+	/**
+	 * 调用查询服务层的查询接口
+	 * @param count 找几个人
+	 * @param a1年龄上限
+	 * @param a2年龄下限
+	 * @return
+	 */
+	public List<EntryForm> getNewEntryForm(int count, int a1, int a2){
+		return EntryFormQuery.getInstance().getNewEntryForm(count, a1, a2);
+	}
+	
+	/**
+	 * 
+	 * @param type 1：大学，2：高中
+	 * @param school 学校
+	 * @param sex 性别
+	 * @param level 入学年份
+	 * @param num 分页号
+	 * @return
+	 */
+	public List<EntryForm> getRankListByType(final String type, final String school, final int sex, final int level, final int num){
+		String s = type.substring(1, 2);
+		if(StringUtil.equals(s, "b")){
+			return EntryFormQuery.getInstance().getRankListByType(type, school, sex, level, num, 1);
+		}else if(StringUtil.equals(s, "c")){
+			return EntryFormQuery.getInstance().getRankListByType(type, school, sex, level, num, 2);
+		}
+		return null;
+	}
+	
+	/**
+	 * 获取名次
+	 * @return
+	 */
+	public RankTO getMyRankPos(int pid){
+		return EntryFormQuery.getInstance().getMyRankPos(pid);
+	}
+	
+	/**
+	 * 获取所有评论的平均分
+	 * @return
+	 */
+	public void getStaticC(){
+		EntryFormQuery.getInstance().getStaticC();
+	}
+}

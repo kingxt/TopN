@@ -1,0 +1,173 @@
+﻿(
+function (jQuery) {
+   var options = {
+        isStatus: false,
+        trigger: null
+        
+    }; 
+    // 加载心情发表的表情
+    this.statusExpressionInit = function (sender, item, event) {
+        options.isStatus = true;
+        this.initExpression(sender, item);
+        stopPropagation(event);
+    };
+    
+    
+    
+    // 加载心情回复发表的表情
+    this.replyExpressionInit = function (sender, item) {
+        options.isStatus = false;
+        this.initExpression(sender, item);
+    };
+    
+   
+    // 加载心情Div代码
+    this.fillExpressionDiv = function () {
+    	var str;
+    	$.ajax({
+    		type : "get",
+    		url : 'loadExpression.action',
+    		cache : true,
+    		async : false,
+    		error : function() {
+    			// loadingStateFlag = false;
+    		},
+    		success : function(msg) {
+    			str = msg;
+    		}
+    	});
+    	return str;
+    };
+    // 加载表情(分发表心情的表情和回复的表情)
+    this.initExpression = function (sender, item) {
+        var expression_div = $("#expression_div");
+        if (expression_div == undefined || expression_div == null || expression_div.length == 0) {
+            expression_div = $(fillExpressionDiv());
+        }
+        item = typeof item == "string" ? $("#" + item) : item;
+		if (options.isStatus == true) {
+			expression_div.appendTo(item).css("margin-top", "-28px").css("margin-left", "0px").show();
+		} 
+		else {
+			expression_div.appendTo(item).css("margin-left", "-288px").css("margin-top", "-28px").show();
+		}
+		
+		
+		/*if(options.trigger!=null&&options.trigger!=undefined)
+		{
+			$(options.trigger).show();
+		}
+        $(sender).hide();
+        options.trigger = sender;*/
+        // 绑定每个表情的点击事件
+        $("#expression_div>ul>li>a").click(function () {
+            // 解决Jquery的累积点击事件
+            $(this).unbind("click");
+            var moodArea = null;
+            if (options.isStatus == false) {
+                moodArea = $(this).parents(".reply_add_div").first().find(".reply_add_area");
+            }
+            else {
+                moodArea = $("#moodText");
+            }
+            var expressionString = $(this).attr("title");
+            if (expressionString == null || expressionString == undefined || expressionString == "") {
+                return;
+            }
+            else {
+                moodArea.val(moodArea.val() + expressionString);
+            }
+            $("#expression_div").hide();
+            $(options.trigger).show();
+            
+            moodArea.trigger("onkeyup");
+           // stopPropagation(event);
+        });
+        
+    };
+    // 匹配正则
+    this.matchExpression = function (value) {
+        var imgHtml;
+        $("#expression_div ul li a").each(function () {
+            if ($(this).attr("title") == value) {
+                imgHtml = "<img src='" + $(this).find("img").attr("src") + "' />";
+                return;
+            }
+        });
+        return imgHtml;
+    };
+    // 心情回复和发表匹配正则返回表情
+    this.publish_status = function (item) {
+        var statusString = $(item).val();
+        if (statusString == "") {
+            return;
+        }
+        var reg = /\([\u4e00-\u9fa5]{1,3}\)/g;
+        var expressions = statusString.match(reg);
+        if (expressions != null) {
+            for (var i = 0; i < expressions.length; i++) {
+                var expressionHtml = matchExpression(expressions[i]);
+                if (expressionHtml == null || expressionHtml == undefined || expressionHtml == "") {
+                    continue;
+                }
+                var reg1 = /\(/;
+                var reg2 = /\)/;
+                var regE = new RegExp(expressions[i].replace(reg1, "\\(").replace(reg2, "\\)"));
+                statusString = statusString.replace(regE, expressionHtml);
+            }
+        };
+        $(item).val("");
+        return statusString;
+    };
+    // 发表最新心情
+    this.publish_lastedStatus = function () {
+        $("#expression_div").hide();
+        if(!checkCount($("#moodText"))){
+        	showMessage("提示","系统要求您输入的字数大于140个，谢谢");
+        	return;
+        }
+    
+        var lastedStatusString = publish_status("#moodText");
+        InsertToDB(lastedStatusString);
+    };
+    
+    this.leaveMsg = function(){
+    	$("#expression_div").hide();
+    	if(!checkCount($("#moodText"))){
+        	showMessage("提示","系统要求您输入的字数大于140个，谢谢");
+        	return;
+        }
+        var lastedStatusString = publish_status("#moodText");
+        leaveMsgDB(lastedStatusString, $.query.get("personalInfoId"));
+    };
+    
+    // 发表最新心情存入数据库
+    this.InsertToDB = function (lastedStatusString) {
+    	publishMood(lastedStatusString);
+    };
+    // 回复心情发表
+    this.reply_status = function (item, centerObj) {
+        $("#expression_div").hide();
+        if(!checkCount($(item))){
+        	showMessage("提示","系统要求您输入的字数大于140个，谢谢");
+        	return;
+        }
+        var replyString = publish_status(item);
+		replyMoodTo(centerObj, replyString);
+    };
+    
+    //留言处理
+    this.reply_leave_status = function (item, centerObj) {
+        $("#expression_div").hide();
+        if(!checkCount($(item))){
+        	showMessage("提示","系统要求您输入的字数大于140个，谢谢");
+        	return;
+        }
+        var replyString = publish_status(item);
+        replyFriendsLeave(centerObj, replyString);
+    };
+    
+	jQuery.expression = this;
+    return jQuery;
+}
+)(jQuery);

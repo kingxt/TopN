@@ -1,0 +1,21 @@
+#worker.list=controller,tomcat8009,tomcat9009
+worker.list=controller,tomcat8009
+
+#----------config tomcat8009-----------
+worker.tomcat8009.port=8009
+worker.tomcat8009.host=localhost
+worker.tomcat8009.type=ajp13
+worker.tomcat8009.lbfactor=1
+
+#----------config tomcat9009-----------
+worker.tomcat9009.port=9009
+worker.tomcat9009.host=localhost
+worker.tomcat9009.type=ajp13
+worker.tomcat9009.lbfactor=1
+
+
+#========controller====== 
+worker.controller.type=lb 
+#worker.controller.balanced_workers=tomcat8009,tomcat9009
+worker.controller.balanced_workers=tomcat8009
+worker.controller.sticky_session=1

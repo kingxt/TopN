@@ -1,0 +1,283 @@
+package com.topn.action;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
+import org.apache.struts2.ServletActionContext;
+
+import com.opensymphony.xwork2.ActionContext;
+import com.opensymphony.xwork2.ActionSupport;
+import com.topn.DAL.PersonalInfoDAL;
+import com.topn.action.help.CookieHelp;
+import com.topn.bean.City;
+import com.topn.bean.District;
+import com.topn.bean.HighSchool;
+import com.topn.bean.PersonalInfo;
+import com.topn.bean.Province;
+import com.topn.bean.University;
+import com.topn.bean.TO.CacheEducationTO;
+import com.topn.bean.TO.PermissionsTO;
+import com.topn.cache.UserCache;
+import com.topn.collection.MyMapEntry;
+import com.topn.collection.UserInRegister;
+import com.topn.controller.PersonalController;
+import com.topn.util.DateUitl;
+import com.topn.util.EmailSender;
+import com.topn.util.StringUtil;
+import com.topn.util.Table;
+
+/**
+ * 
+ * 创建人 KingXt 创建时间：2011-3-20 下午03:19:18
+ * 
+ * 注册用的action
+ */
+public class RegisterAction extends ActionSupport {
+
+	// 返回的值
+	private String result;
+
+	// 用户名，邮箱
+	private String username;
+
+	// 密码
+	private String password;
+
+	// 确认密码
+	private String confirmPassword;
+
+	// code 验证码
+	private String code;
+
+	// 忘记密码标识
+	private String usersign;
+
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * 注册用的
+	 * 
+	 * @return
+	 */
+	public String register() {
+		int id = 0;
+		if (!StringUtil.equals(password, confirmPassword)) {
+			result = "两次密码输入不一致";
+			ActionContext.getContext().put("remind", result);
+			return "register";
+		}
+
+		String codeT = UserInRegister.getInstance().find(username);
+		if (null == codeT) {
+			result = "您输入的验证码不正确，验证码发送到您邮箱，请注意查收，谢谢";
+			ActionContext.getContext().put("remind", result);
+			return "register";
+		}
+		if (!StringUtil.equals(codeT, code)) {
+			result = "您输入的验证码不正确，验证码发送到您邮箱，请注意查收，谢谢";
+			ActionContext.getContext().put("remind", result);
+			return "register";
+		} else {
+			username = username.toLowerCase();
+			id = PersonalInfoDAL.getInstance().regiser(
+					UserInRegister.getTableName(username), username, password);
+			if (id <= 0) {
+				result = "邮箱已被注册";
+				ActionContext.getContext().put("remind", result);
+				return "register";
+			}
+		}
+		CookieHelp.setPersonalId(ServletActionContext.getResponse(), id);
+		CookieHelp.setUsername(ServletActionContext.getResponse(), username);
+		PersonalInfo pi = new PersonalInfo();
+		pi.setPersonalInfoId(id);
+		pi.setPhoto(Table.PARENT_PATH + Table.DEFAULT_PERSON_PHOTO);
+		UserCache.getInstance().add(id, UserInRegister.getTableName(username));
+
+		// education info
+		CacheEducationTO cto = PersonalController.getInstance()
+				.getCacheEducationTO();
+		List<Province> pc = cto.getPc();
+		List<University> us = cto.getUs();
+		List<City> cs = cto.getCs();
+		List<District> ds = cto.getDs();
+		List<HighSchool> hs = cto.getHs();
+		ActionContext.getContext().put("pc", pc);
+		ActionContext.getContext().put("us", us);
+		ActionContext.getContext().put("cs", cs);
+		ActionContext.getContext().put("ds", ds);
+		ActionContext.getContext().put("hs", hs);
+
+		ActionContext.getContext().put("per",
+				PermissionsTO.string2PermissionsTO(pi.getPermission()));
+		// ActionContext.getContext().put("school",pi.getSchool());
+
+		ActionContext.getContext().put("college", pi.getCollege());
+		ActionContext.getContext().put("colLevel", pi.getColLevel());
+		ActionContext.getContext().put("highSchool", pi.getHighSchool());
+		ActionContext.getContext().put("highLevel", pi.getHighLevel());
+		ActionContext.getContext().put("endYear", DateUitl.getThisYear());
+		return SUCCESS;
+	}
+
+	/**
+	 * 获取验证码
+	 * 
+	 * @return
+	 */
+	public String getCode() {
+		if (StringUtil.isBlank(username))
+			return null;
+		MyMapEntry<String, String> msg = null;
+		if (!StringUtil.isValidEmail(username)) {
+			msg = new MyMapEntry<String, String>("sendMsg", "您输入的邮箱不正确");
+			JSONObject jo = JSONObject.fromObject(msg);
+			this.result = jo.toString();
+			return SUCCESS;
+		}
+		if (PersonalController.getInstance().isExistUsername(username)) {
+			msg = new MyMapEntry<String, String>("sendMsg", "您输入的邮箱已被注册");
+			JSONObject jo = JSONObject.fromObject(msg);
+			this.result = jo.toString();
+			return SUCCESS;
+		}
+		// 如果发送了一份就不发送了
+		if (UserInRegister.getInstance().find(username) != null) {
+			msg = new MyMapEntry<String, String>("sendMsg", "服务器已经或正在将邮件发送到您邮箱");
+			JSONObject jo = JSONObject.fromObject(msg);
+			this.result = jo.toString();
+			return SUCCESS;
+		}
+		String code = UserInRegister.generateCode();
+		EmailSender es = EmailSender.getInstance();
+		boolean isSend = es.send(username, username,
+				EmailSender.SUBJECT_VERIFICATION_CODE, "您的注册码是：   " + code);
+
+		if (isSend) {
+			UserInRegister.getInstance().add(username, code);
+			msg = new MyMapEntry<String, String>("sendMsg", "验证码已经发送到您邮箱，请注意查收");
+		} else {
+			msg = new MyMapEntry<String, String>("sendMsg", "您输入的邮箱不正确,或是后台出错");
+			JSONObject jo = JSONObject.fromObject(msg);
+			this.result = jo.toString();
+			return SUCCESS;
+		}
+		List<MyMapEntry<String, String>> ms = new ArrayList<MyMapEntry<String, String>>();
+		ms.add(msg);
+		MyMapEntry<String, String> t = StringUtil.getEmailHomeURL(username);// 导航到邮件主页
+		ms.add(t);
+
+		JSONArray ja = JSONArray.fromObject(ms);
+
+		this.result = ja.toString();
+		return SUCCESS;
+	}
+
+	/**
+	 * 发邮件给用户，要用户重置密码
+	 * 
+	 * @return
+	 */
+	public String sendCertification() {
+		String verification = CookieHelp.getVerification(ServletActionContext
+				.getRequest());
+		if (!StringUtil.equals(code, verification)) {
+			ActionContext.getContext().put("remind", "验证码输入不正确");
+			return "verificationError";
+		}
+		if (!StringUtil.isValidEmail(username)) {
+			ActionContext.getContext().put("remind", "邮箱格式输入不正确");
+			return "verificationError";
+		}
+
+		String sing = UUID.randomUUID().toString();
+		String body = "请点击此链接修改密码<a href='" + getRandomURL(sing) + "'>"
+				+ getRandomURL(sing) + "</a>";
+		// System.out.println(body);
+		EmailSender.getInstance().sendHTML(username, username,
+				EmailSender.SUBJECT_FORGET_PWD, body);
+		UserInRegister.getInstance().addForgetUser(sing, username);
+		ActionContext.getContext().put("mme",
+				StringUtil.getEmailHomeURL(username));
+		return SUCCESS;
+	}
+
+	public String toResetPwdInput() {
+		String un = UserInRegister.getInstance().getForgetPasswordTO(usersign);
+		if (un == null) {
+			result = "对不起，此次发送的链接已经过期，您可以重新获取修改密码链接";
+			ActionContext.getContext().put("remind", result);
+			return "verificationError";
+		}
+		ActionContext.getContext().put("username", un);
+		return SUCCESS;
+	}
+
+	public String resetPassword() {
+		if (!StringUtil.equals(password, confirmPassword)) {
+			result = "两次密码输入不一致";
+			ActionContext.getContext().put("remind", result);
+			return "verificationError";
+		}
+		if (StringUtil.isLessThen(password, 4)
+				|| StringUtil.isLessThen(confirmPassword, 4)) {
+			result = "为了安全起见，密码长度要大于4";
+			ActionContext.getContext().put("remind", result);
+			return "verificationError";
+		}
+
+		PersonalController.getInstance().fogetPwd(
+				UserInRegister.getTableName(username), username, password);
+		return SUCCESS;
+	}
+
+	public String getRandomURL(String sign) {
+
+		return UserInRegister.DOMAIN + "page/resetpwd.action?usersign=" + sign;
+	}
+
+	public String getResult() {
+		return result;
+	}
+
+	public void setResult(String result) {
+		this.result = result;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public void setConfirmPassword(String confirmPassword) {
+		this.confirmPassword = confirmPassword;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
+	public void setUsersign(String usersign) {
+		this.usersign = usersign;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public String getUsersign() {
+		return usersign;
+	}
+
+}

@@ -1,0 +1,467 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+
+	<package name="kingxt" extends="global" namespace="">		
+		<!-- 登录用的 -->
+		<action name="login" class="com.topn.action.LoginAction"
+			method="login">
+			<result name="success">/page/topn.jsp</result>
+		</action>
+		<action name="resetPassword" class="com.topn.action.RegisterAction" method="resetPassword">
+			<result name="success" type="chain">
+				<param name="actionName">login</param>
+				<param name="namespace">/</param>
+			</result>
+			<result name="verificationError">/page/resetpwd.jsp</result>
+		</action>
+		<!-- 返回topn -->
+		<action name="totopn" class="com.topn.action.PersonalAction" method="toTopN">
+			<result name="success">/page/topn.jsp</result>
+		</action>
+		
+	</package>
+
+	<!--访问page目录下的页面  -->
+	<package name="page" extends="global" namespace="/page">
+		<action name="reload" class="com.topn.action.LoginAction"
+			method="login">
+			<result name="success">/page/topn.jsp</result>
+		</action>
+		
+		<!-- 注册用的 ,注册后直接导航到修改个人信息页面-->
+		<action name="register" class="com.topn.action.RegisterAction"
+			method="register">
+			<result name="success">/page/personal/require_info.jsp</result>
+		</action>
+
+		<action name="personalPage" class="com.topn.action.PersonalAction"
+			method="toHomePage">
+			<result name="success">/page/personal_page.jsp</result>
+			<result name="friendrecommend">/page/person_register_after.jsp</result>
+		</action>
+
+		<action name="showBaseInfo" class="com.topn.action.PersonalAction"
+			method="showBaseInfo">
+			<result name="othersBaseInfo">/page/personal/show_personal_info.jsp</result>
+			<result name="success">/page/personal/show_my_info.jsp</result>
+		</action>
+
+		<action name="updateBaseInfoInput" class="com.topn.action.PersonalAction"
+			method="updateBaseInfoInput">
+			<result name="success">/page/update_info.jsp</result>
+		</action>
+		
+		<action name="baseInfoInput" class="com.topn.action.PersonalAction"
+			method="baseInfoInput">
+			<result name="success">/page/personal/base_info.jsp</result>
+		</action>
+
+		<action name="updatePersonalInfo" class="com.topn.action.PersonalAction"
+			method="updatePersonalInfo">
+			<result type="redirectAction">showBaseInfo</result>
+		</action>
+
+		<action name="loadHobbyType" class="com.topn.action.HobbyAndHobbyTypeAction"
+			method="initFace">
+			<result name="success">/page/personal/hobby_type.jsp</result>
+		</action>
+
+		<action name="loadHobby" class="com.topn.action.HobbyAndHobbyTypeAction"
+			method="loadHobby">
+			<result name="success">/page/personal/hobby.jsp</result>
+		</action>
+
+		<action name="loadPersonalAlbum" class="com.topn.action.AlbumAction"
+			method="loadPersonalAlbum">
+			<result name="success">/page/personal_album.jsp</result>
+		</action>
+
+		<action name="loadAlbumPhotos" class="com.topn.action.PhotoAction"
+			method="loadAlbumPhotos">
+			<result  name="album" >/page/album.jsp</result>
+			<result  name="pic_manage" >/page/manage_photos.jsp</result>
+		</action>
+
+		<action name="loadUploadPhoto" class="com.topn.action.AlbumAction"
+			method="loadUploadPhoto">
+			<result name="success">/page/upload_pictures.jsp</result>
+		</action>
+
+		<action name="loadEducation" class="com.topn.action.EducationAction"
+			method="loadEducation">
+			<result name="success">/page/personal/education.jsp</result>
+		</action>
+
+		<action name="updateEducation" class="com.topn.action.EducationAction"
+			method="updateSchool">
+			<result type="redirectAction">showBaseInfo</result>
+		</action>
+		
+		<action name="updateHobby" class="com.topn.action.HobbyAndHobbyTypeAction" method="updateHobby">
+			<result type="redirectAction">showBaseInfo</result>
+		</action>
+		
+		<!-- 加载教育信息 -->
+		<action name="loadUniversity" class="com.topn.action.EducationAction"
+			method="loadUniversityByProvinceId">
+			<result name="success">/page/personal/university.jsp</result>
+		</action>
+		<action name="loadCityByProvince" class="com.topn.action.EducationAction" method="loadCityByProvince">
+			<result name="success">/page/personal/city.jsp</result>
+		</action>
+		<action name="loadDistrictByCity" class="com.topn.action.EducationAction" method="loadDistrictByCity">
+			<result name="success">/page/personal/district.jsp</result>
+		</action>
+		<action name="loadHighSchoolByDistrict" class="com.topn.action.EducationAction" method="loadHighSchoolByDistrict">
+			<result name="success">/page/personal/high_school.jsp</result>
+		</action>
+		<action name="searchUniversities" class="com.topn.action.EducationAction"
+		 	method="searchUniversities">
+			<result name="success">/page/personal/university.jsp</result>
+		</action>
+		
+		
+		<action name="loadUploadHeadPortrait" class="com.topn.action.PhotoAction"
+		 	method="loadUploadHeadPortrait">
+			<result name="success">/page/cut_headPortrait.jsp</result>
+		</action>
+		
+		
+
+		<!-- 處理搜索业务 -->
+		<action name="friendSearch" class="com.topn.action.FriendAction"
+			method="friendSearch">
+			<result name="success">/page/personal/friend_search.jsp</result>
+		</action>
+		<action name="searchFriend" class="com.topn.action.FriendAction" method="searchFriend">
+			<result name="success">/page/personal/search_result.jsp</result>
+		</action>
+		<action name="searchHobbyFriend" class="com.topn.action.FriendAction" method="searchWithHobby">
+			<result name="success">/page/personal/search_result.jsp</result>
+		</action>
+		<action name="searchEmailFriend" class="com.topn.action.FriendAction" method="searchWithEmail">
+			<result name="success">/page/personal/search_result.jsp</result>
+		</action>
+		<action name="searchSchoolFriend" class="com.topn.action.FriendAction" method="searchWithSchool">
+			<result name="success">/page/personal/search_result.jsp</result>
+		</action>
+		<action name="searchForTopN" class="com.topn.action.FriendAction" method="searchForTopN">
+			<result name="success">/page/personal/search_result.jsp</result>
+		</action>
+		
+		<!-- 访问别人的主页 -->
+		<action name="visitor" class="com.topn.action.VisitorAction"
+			method="visitOther">
+			<result name="success">/page/homepage.jsp</result>
+			<result type="redirectAction" name="tomyhome">
+				personalPage?personalInfoId=${personalInfoId}
+            </result>
+		</action>
+		
+		<!-- 访问心情 -->
+		<action name="publishMood" class="com.topn.action.MoodAction" method="publishMood">
+			<result name="success">/page/personal/more_status.jsp</result>
+		</action>
+		<action name="loadMainMood" class="com.topn.action.MoodAction" method="loadMainMood">
+			<result name="success">/page/mood.jsp</result>
+		</action>
+		<action name="getMoodAllReplies" class="com.topn.action.MoodAction" method="getMoodAllReplies">
+			<result name="success">/page/personal/replies.jsp</result>
+		</action>
+		<action name="getMyMoodAllReplies" class="com.topn.action.MoodAction" method="getMyMoodAllReplies">
+			<result name="success">/page/personal/my_mood_replies.jsp</result>
+		</action>
+		<action name="loadNDayLaterMood" class="com.topn.action.MoodAction" method="loadNDayLaterMood">
+			<result name="success">/page/personal/more_status.jsp</result>
+		</action>
+		<action name="publishReplyMood" class="com.topn.action.MoodAction" method="replyMood">
+			<result name="success">/page/personal/replies.jsp</result>
+		</action>
+		<action name="publishReplyMyMood" class="com.topn.action.MoodAction" method="replyMyMood">
+			<result name="success">/page/personal/my_mood_replies.jsp</result>
+		</action>
+		<action name="getMyMood" class="com.topn.action.MoodAction" method="getMyMood">
+			<result name="success">/page/personal/owner_mood.jsp</result>
+		</action>
+		<action name="getMyMoodPage" class="com.topn.action.MoodAction" method="getMyMoodPage">
+			<result name="success">/page/personal/my_mood_page_status.jsp</result>
+		</action>
+		<action name="visitorLeaveMsg" class="com.topn.action.VisitorAction" method="visitorLeaveMsg">
+			<result name="success">/page/personal/visitor_status.jsp</result>
+		</action>
+		<!-- 访问留言模块 -->
+		<action name="toLeaveMsgs" class="com.topn.action.MoodAction" method="toLeaveMsgs">
+			<result name="success">/page/personal/leave_msg.jsp</result>
+		</action>
+		<action name="getLeaveMsgs" class="com.topn.action.MoodAction" method="getLeaveMsgs">
+			<result name="success">/page/personal/msg.jsp</result>
+		</action>
+		<action name="openLeaveMsgReplies" class="com.topn.action.MoodAction" method="openLeaveMsgReplies">
+			<result name="success">/page/personal/leave_replies.jsp</result>
+		</action>
+		<action name="replyLeaveMsg" class="com.topn.action.MoodAction" method="leaveMsg">
+			<result name="success">/page/personal/leave_replies.jsp</result>
+		</action>
+		
+		
+		<!-- 管理好友 -->
+		<action name="manageFriend" class="com.topn.action.FriendAction" method="manageFriend">
+			<result name="success">/page/personal/friend_manage.jsp</result>
+		</action>
+		<action name="loadFriendByType" class="com.topn.action.FriendAction" method="loadFriendByType">
+			<result name="success">/page/personal/friend_type_list.jsp</result>
+		</action>
+		
+		<!-- 提示信息 -->
+		<action name="toTips" class="com.topn.action.PersonalAction" method="toTips">
+			<result name="success">/page/page_right/tips.jsp</result>
+			<result name="moodTips">/page/page_right/mood_tips.jsp</result>
+			<result name="leaveMsgTips">/page/page_right/leave_msg_tips.jsp</result>
+		</action>
+		<action name="loadTips" class="com.topn.action.PersonalAction" method="loadTips">
+			<result name="success">/page/page_right/tips.jsp</result>
+			<result name="systemTip">/page/page_right/system_tips.jsp</result>			
+			<result name="friendTip">/page/page_right/friend_tips.jsp</result>			
+			<result name="moodTip">/page/page_right/mood_tips.jsp</result>		
+			<result name="leaveMsgTip">/page/page_right/leave_msg_tips.jsp</result>		
+		</action>
+		
+		<!-- 修改密码 -->
+		<action name="modifyPwdInput" class="com.topn.action.PersonalAction" method="modifyPwdInput">
+			<result name="success">/page/personal/update_password.jsp</result>
+		</action>
+		<!-- 忘记密码 -->
+		<action name="resetpwd" class="com.topn.action.RegisterAction" method="toResetPwdInput">
+			<result name="success">/page/resetpwd.jsp</result>
+			<result name="verificationError">/page/forget_pwd.jsp</result>
+		</action>
+		<action name="sendCertification" class="com.topn.action.RegisterAction" method="sendCertification">
+			<result name="success">/page/toemail.jsp</result>
+			<result name="verificationError">/page/forget_pwd.jsp</result>
+		</action>
+		
+		<!-- 加载表情 -->
+		<action name="loadExpression" class="com.topn.action.CDDAction" method="loadExpression">
+			<result name="success">/page/util/expression.jsp</result>
+		</action>
+		
+		<!-- 游客处理页面 -->
+		<action name="getVisitorMood" class="com.topn.action.MoodAction" method="getVisitorMood">
+			<result name="success">/page/personal/visitor_mood.jsp</result>
+		</action>
+		<action name="visitorsFriends" class="com.topn.action.VisitorAction" method="visitorsFriends">
+			<result name="success">/page/personal/visitor_friends.jsp</result>
+		</action>
+		<action name="visitorsFriendsPG" class="com.topn.action.VisitorAction" method="visitorsFriendsPG">
+			<result name="pg">/page/personal/visitor_friend.jsp</result>
+		</action>
+		
+		<!-- 导航到直接修改头像 -->
+		<action name="directModifyPhoto" class="com.topn.action.PersonalAction" method="directModifyPhoto">
+			<result name="success">/page/personal/modify_photo.jsp</result>
+		</action>
+		
+		<!-- 导航 -->
+		<action name="tourist" class="com.topn.action.TouristAction" method=" tourist">
+			<result name="success">/page/tourist.jsp</result>
+			<result type="redirectAction" name="direct2friends">
+				visitor?personalInfoId=${personalInfoId}
+            </result>
+            <result type="redirectAction" name="tomyhome">
+				personalPage?personalInfoId=${personalInfoId}
+            </result>
+		</action>
+		<action name="touristRank" class="com.topn.action.TouristAction" method=" touristRank">
+			<result name="success">/page/tourist.jsp</result>
+			<result type="redirectAction" name="direct2friends">
+				visitor?personalInfoId=${personalInfoId}
+            </result>
+            <result type="redirectAction" name="tomyhome">
+				personalPage?personalInfoId=${personalInfoId}
+            </result>
+		</action>
+		<!-- 刷新提醒 -->
+		<action name="refreshTips" class="com.topn.action.PersonalAction" method="refreshTips">
+			<result name="success">/page/page_right/right_friend_add_tip.jsp</result>
+		</action>
+		
+		<!-- 好友推荐 -->
+		<action name="friendRecommendation" class="com.topn.action.FriendAction" method="friendRecommendation">
+			<result name="success">/page/personal/recommendation.jsp</result>
+		</action>
+	</package>
+
+	<package name="kingxt_json" extends="topn_global_json" namespace="/page">
+		
+		<!-- 获取验证码，利用json方式 -->
+		<action name="getCode" class="com.topn.action.RegisterAction"
+			method="getCode">
+			<result type="json" name="success">
+				<!-- root的值对应要返回的值的属性 -->
+				<!-- 这里的result值即是 对应action中的 result -->
+				<param name="root">result</param>
+			</result>
+			<result type="redirectAction" name="personalPage">
+				personalPage?personalInfoId=${result}
+            </result>
+		</action>
+		<!-- 修改密码 -->
+		<action name="modifyPwd" class="com.topn.action.PersonalAction"
+			method="modifyPassword">
+			<result type="json" name="success">
+				<!-- root的值对应要返回的值的属性 -->
+				<!-- 这里的result值即是 对应action中的 result -->
+				<param name="root">msg</param>
+			</result>
+		</action>
+		<!-- 处理好友业务 -->
+		<action name="addFriend" class="com.topn.action.FriendAction" method="addFriend">
+			<result type="json">
+				<!-- root的值对应要返回的值的属性 -->
+				<!-- 这里的result值即是 对应action中的 result -->
+				<param name="root">msg</param>
+			</result>
+		</action>
+		
+		
+		
+		<!-- 搜索好友的总数 -->
+		<action name="searchCount" class="com.topn.action.FriendAction" method="searchCount">
+			<result type="json">
+				<!-- root的值对应要返回的值的属性 -->
+				<!-- 这里的result值即是 对应action中的 result -->
+				<param name="root">msg</param>
+			</result>
+		</action>
+		<action name="searchEmailCount" class="com.topn.action.FriendAction" method="searchCountEmail">
+			<result type="json">
+				<!-- root的值对应要返回的值的属性 -->
+				<!-- 这里的result值即是 对应action中的 result -->
+				<param name="root">msg</param>
+			</result>
+		</action>
+		<action name="searchHobbyCount" class="com.topn.action.FriendAction" method="searchCountHobby">
+			<result type="json">
+				<!-- root的值对应要返回的值的属性 -->
+				<!-- 这里的result值即是 对应action中的 result -->
+				<param name="root">msg</param>
+			</result>
+		</action>
+		<action name="searchSchoolCount" class="com.topn.action.FriendAction" method="searchCountSchool">
+			<result type="json">
+				<!-- root的值对应要返回的值的属性 -->
+				<!-- 这里的result值即是 对应action中的 result -->
+				<param name="root">msg</param>
+			</result>
+		</action>
+		
+		
+		
+		
+		
+		<!-- 删除好友 -->
+		<action name="removeFriend" class="com.topn.action.FriendAction" method="deleteFriend">
+			<result type="json">
+				<!-- root的值对应要返回的值的属性 -->
+				<!-- 这里的result值即是 对应action中的 result -->
+				<param name="root">msg</param>
+			</result>
+		</action>
+		
+		<!-- 修改好友 -->
+		<action name="modifyFriendType" class="com.topn.action.FriendAction" method="modifyFriendType">
+			<result type="json">
+				<!-- root的值对应要返回的值的属性 -->
+				<!-- 这里的result值即是 对应action中的 result -->
+				<param name="root">msg</param>
+			</result>
+		</action>
+		
+		<!-- 确认添加为好友 -->
+		<action name="realAddFriend" class="com.topn.action.FriendAction" method="realAddFriend">
+			<result type="json">
+				<!-- root的值对应要返回的值的属性 -->
+				<!-- 这里的result值即是 对应action中的 result -->
+				<param name="root">msg</param>
+			</result>
+		</action>
+		
+		<!-- 删除多个好友申请 -->
+		<action name="deleteAllSelectedFriend" class="com.topn.action.FriendAction" method="deleteAllSelectedFriend">
+			<result type="json">
+				<!-- root的值对应要返回的值的属性 -->
+				<!-- 这里的result值即是 对应action中的 result -->
+				<param name="root">msg</param>
+			</result>
+		</action>
+		<!-- 删除系统提示 -->
+		<action name="delSystemTips" class="com.topn.action.PersonalAction" method="delSystemTips">
+			<result type="json">
+				<!-- root的值对应要返回的值的属性 -->
+				<!-- 这里的result值即是 对应action中的 result -->
+				<param name="root">msg</param>
+			</result>
+		</action>
+		
+		<!-- 获取自己的所有好友(包括密友) -->
+		<action name="getAllMyFriend" class="com.topn.action.FriendAction" method="getAllMyFriend">
+			<result type="json">
+				<!-- root的值对应要返回的值的属性 -->
+				<!-- 这里的result值即是 对应action中的 result -->
+				<param name="root">msg</param>
+			</result>
+		</action>
+		
+		
+		<!-- 下面是关于心情，回复，留言的一些删除操作 -->
+		<action name="deleteMood" class="com.topn.action.MoodAction" method="deleteMood">
+			<result type="json">
+				<!-- root的值对应要返回的值的属性 -->
+				<!-- 这里的result值即是 对应action中的 result -->
+				<param name="root">msg</param>
+			</result>
+		</action>
+		<action name="deleteReply" class="com.topn.action.MoodAction" method="deleteReply">
+			<result type="json">
+				<!-- root的值对应要返回的值的属性 -->
+				<!-- 这里的result值即是 对应action中的 result -->
+				<param name="root">msg</param>
+			</result>
+		</action>
+		<action name="deleteLeaveMsg" class="com.topn.action.MoodAction" method="deleteLeaveMsg">
+			<result type="json">
+				<!-- root的值对应要返回的值的属性 -->
+				<!-- 这里的result值即是 对应action中的 result -->
+				<param name="root">msg</param>
+			</result>
+		</action>
+		<action name="deleteReplyLeaveMsg" class="com.topn.action.MoodAction" method="deleteReplyLeaveMsg">
+			<result type="json">
+				<!-- root的值对应要返回的值的属性 -->
+				<!-- 这里的result值即是 对应action中的 result -->
+				<param name="root">msg</param>
+			</result>
+		</action>
+		
+		
+		<action name="feedback" class="com.topn.action.FeedBackAction" method="feedback">
+			<result type="json">
+				<!-- root的值对应要返回的值的属性 -->
+				<!-- 这里的result值即是 对应action中的 result -->
+				<param name="root">msg</param>
+			</result>
+		</action>
+		<action name="errorlogin" class="com.topn.action.LoginAction"
+			method="relogin">
+			<result name="loginerror">/page/util/relogin.jsp</result>
+			<result type="json">
+				<!-- root的值对应要返回的值的属性 -->
+				<!-- 这里的result值即是 对应action中的 result -->
+				<param name="root">msg</param>
+			</result>
+		</action>
+	</package>
+</struts>

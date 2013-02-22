@@ -1,0 +1,356 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+<title>联系我们</title>
+<link type="text/css" rel="stylesheet" href="../styles/contact_us.css" />
+<link rel="shortcut icon" href="../pictures/222.ico"/>
+
+<script type="text/javascript" src="../scripts/topn.jquery-1.4.1.js"></script>
+<script type="text/javascript" src="../scripts/topn.common.js" ></script>
+<style type="text/css">#zxxBlank{position:absolute;z-index:2000;left:0;top:0;width:100%;filter:alpha(opacity=50);opacity:.5;height:100%;background:black;display:none}.wrap_out{display:none;padding:5px;background:#eee;box-shadow:0 0 6px rgba(0,0,0,.5);-moz-box-shadow:0 0 6px rgba(0,0,0,0.5);-webkit-box-shadow:0 0 6px rgba(0,0,0,.5);position:absolute;z-index:2000;}.wrap_in{ overflow:hidden;height:100%;background:#fafafa;border:1px solid #ccc;}.wrap_bar{background:#f7f7f7;border-top:3px solid #f9f9f9;border-bottom:4px solid #eee;margin-top:2px;}.wrap_title{line-height:5px;background:#f3f3f3;border-top:4px solid #f5f5f5;border-bottom:5px solid #f1f1f1;margin-top:3px;}.wrap_title span{font-size:12px;position:relative;margin-left:10px;cursor:text;}.wrap_body{border-top:1px solid #ddd;background:white; height:100%;}.wrap_close{margin-top:-18px;margin-right:10px;color:#34538b;font-weight:bold;font-family:Tahoma;text-decoration:none;cursor:pointer;float:right;}.wrap_close:hover{text-decoration:none;color:#f30;}.wrap_remind{width:16em;padding:30px 40px;}.wrap_remind p{margin:10px 0 0;}.submit_btn{display:inline-block;padding:3px 12px 1.99px;background:#486aaa;border:1px solid;border-color:#a0b3d6 #34538b #34538b #a0b3d6;color:#f3f3f3;line-height:16px;cursor:pointer;overflow:visible;}.submit_btn:hover{text-decoration:none;color:#ffffff;}.cancel_btn{display:inline-block;padding:3px 12px 1.99px;background:#eee;border:1px solid;border-color:#f0f0f0 #bbb #bbb #f0f0f0;color:#333;line-height:16px;cursor:pointer;overflow:visible;}</style>
+</head>
+<body>
+	
+	<div  class="contact_us_bg_div">
+		<div id="header" class="contact_header" >
+	        	<div id="logo_img_div" class="logo_img_div">
+				</div>
+				<div id="navigation_div" class="navigation_div">
+					<ul>
+						<li>
+							<a class="exit_a" onclick="javascript:window.close();"></a>
+						</li>
+					</ul>
+				</div>
+   		 </div>   		
+		<div class="us_photo_div" id="us_photo_div">			
+			<ul>
+				<li>
+					<table class="info_table">
+						<tr>
+							<td><a title="Murder" name="murder_div"><img  src="../photos/lp.jpg"/></a></td>							
+						</tr>
+						<tr>
+							<td>雷鹏</td>							
+						</tr>
+						<tr>
+							<td>设计师</td>
+						</tr>
+					</table>
+				</li>				
+				<li>
+					<table class="info_table">
+						<tr>
+							<td><a title="Jason" name="jason_div"><img  src="../photos/zjs.jpg"/></a></td>							
+						</tr>
+						<tr>
+							<td>朱济松</td>							
+						</tr>
+						<tr>
+							<td>DBA</td>
+						</tr>
+					</table>
+				</li>
+				<li >
+					<table class="info_table">
+						<tr>
+							<td><a title="徐涛" name="kingxt_div"><img  src="../photos/xt.jpg"/></a></td>							
+						</tr>
+						<tr>
+							<td>徐涛</td>							
+						</tr>
+						<tr>
+							<td>CEO</td>
+						</tr>
+					</table>
+				</li>
+				<li>
+					<table class="info_table">
+						<tr>
+							<td><a title="张帆" name="zf_div"><img  src="../photos/zf.jpg"/></a></td>							
+						</tr>
+						<tr>
+							<td>张帆</td>							
+						</tr>
+						<tr>
+							<td>CFO</td>
+						</tr>
+					</table>
+				</li>
+				<li style=" margin-right:0px;">
+					<table class="info_table">
+						<tr>
+							<td><a title="张顺" name="zs_div"><img  src="../photos/zs.jpg"/></a></td>							
+						</tr>
+						<tr>
+							<td>张顺</td>							
+						</tr>
+						<tr>
+							<td>工程师</td>
+						</tr>
+					</table>
+				</li>
+			</ul>			
+		</div>	
+		<div class="message_to_us_div">
+			<h5 class="message_to_us_h5">期待您的宝贵意见：</h5>
+			<div class="message_to_us_conent_div">
+				
+				<div>
+					<textarea class="message_to_us_area" id="message_to_us_area"></textarea>
+				</div> 
+			    <div>
+			    	 <input type="button" class="submit_button"  onclick="feedback()"/>
+			    </div>	
+			</div>
+			<div class="message_to_reader_conent_div">
+				
+			</div>
+			
+		</div>
+		
+	</div>
+	
+	<div class="intorduce_div" id="murder_div">
+			<div class="personal_photo_div">
+				<img  src="../photos/lp.jpg"/>
+			</div>
+			<div class="personal_info_div">
+					<ul>
+						<li>姓名:雷鹏</li>
+						<li>联系方式:peterlei@live.cn</li>
+						<li>职责:页面布局,JS效果,后台搭建</li>
+						<li>爱好:上网,看动漫,DOTA</li>
+
+					</ul>
+			</div>
+	</div>
+	<div class="intorduce_div" id="jason_div">
+			<div class="personal_photo_div">
+				<img  src="../photos/zjs.jpg"/>
+			</div>
+			<div class="personal_info_div">
+					<ul>
+						<li>姓名：朱济松</li>
+						<li>联系方式：jason900311@163.com</li>
+						<li>职责：数据库设计与管理 </li>
+						<li>爱好：DOTA,上网,旅游</li>
+
+					</ul>
+			</div>
+	</div>
+	<div class="intorduce_div" id="kingxt_div">
+			<div class="personal_photo_div">
+				<img  src="../photos/xt.jpg"/>
+			</div>
+			<div class="personal_info_div">
+					<ul>
+						<li>姓名：徐涛</li>
+						<li>联系方式：kingxt@163.com</li>
+						<li>职责: 首席执行官,协调小组工作,负责网站架构设计</li>
+						<li>爱好：java,DOTA</li>
+					</ul>
+			</div>
+	</div>
+<div class="intorduce_div" id="zf_div">
+			<div class="personal_photo_div">
+				<img  src="../photos/zf.jpg"/>
+			</div>
+			<div class="personal_info_div">
+					<ul>
+						<li>姓名：张帆</li>
+						<li>联系方式：paradoxical311@hotmail.com</li>
+						<li>职责: 首席财务总监,界面设计,美工,创意总监</li>
+						<li>爱好：概念设计,DOTA</li>
+					</ul>
+			</div>
+	</div>
+	<div class="intorduce_div" id="zs_div">
+			<div class="personal_photo_div">
+				<img  src="../photos/zs.jpg"/>
+			</div>
+			<div class="personal_info_div">
+					<ul>
+						<li>姓名：张顺</li>
+						<li>联系方式：shun65@163.com</li>
+						<li>职责: 图片业务处理</li>
+						<li>爱好：上网,DOTA,动漫</li>
+					</ul>
+			</div>
+	</div>
+	
+	<script>
+			function feedback(){
+				if(jQuery.trim($("#message_to_us_area").val()) == ''){
+					return;
+				}
+				var params = {
+					'text' : jQuery.trim($("#message_to_us_area").val())
+				};
+				new TopNAjax().ajax({
+					type: "post",
+					cache: false,
+					data : params,
+					url: 'feedback.action',
+					loadingAreaId : '',
+					loading : false,
+					beforeSend : function(){
+						$(".submit_button").attr("disabled", "disabled");
+					},
+					success: function (msg) {
+						alert("谢谢您的宝贵意见");
+						$(".submit_button").attr("disabled", "");
+						$("#message_to_us_area").val("");
+			        }
+				});
+			}
+			
+			$(document).ready(function(){
+				resolvePngInIe6();
+				var param={
+							timOut:null,
+							spreadWidthInter:null,
+							spreadHeightInter:null,
+							person:null
+							 };	
+				$(document).click(function(){
+					if($("#wrapOut").length>0)
+					{
+						closeBox();
+					}
+				});	
+				function closeBox()
+				{
+					$("body").append(param.person.css("display","none"));
+					$("#zxxBlank").remove();
+					$("#wrapOut").remove();
+				}
+				function spreadWidth(obj)
+				{
+				clearInterval(param.spreadWidthInter);
+
+					param.spreadWidthInter=setInterval(function()
+						{
+							if(obj.width()<525)
+							{
+								obj.width(obj.width()+30);
+							}
+								setIntroPosition();
+						},5);
+				}
+				function spreadHieght(obj)
+				{
+				clearInterval(param.spreadHeightInter);
+
+					param.spreadHeightInter=setInterval(function()
+					{
+						if(obj.height()<250)
+						{
+							obj.height(obj.height()+15);
+						}						
+						setIntroPosition();
+					},5);
+				}
+				function setIntroPosition()
+				{	
+					var obj=$("#wrapOut");
+						InitPosition(obj, 3);
+						checkSize(obj);
+				}
+				function checkSize(obj)
+				{
+					if(obj.height()>=250)
+					{
+						clearInterval(param.spreadHeightInter);
+					}
+					if(obj.width()>=525)
+					{
+						clearInterval(param.spreadWidthInter);
+						param.person.show();
+						$("#loading_div").hide();
+					}
+				}
+				function setBgTitle(title)
+				{
+					$("#zxxBlank").show();	
+					$("#wrap_title_span").html(title);				
+				}
+				function setIntroBg(obj)
+				{
+					setBg($("#zxxBlank"));			
+				}
+				function showInfo(title)
+				{
+					var wrap='<div id="zxxBlank" onselectstart="return false;"></div><div class="wrap_out" id="wrapOut" style="width:525px;height:250px;"><div class="wrap_in" id="wrapIn"><div id="wrapBar" class="wrap_bar"><div class="wrap_title"><span id="wrap_title_span"></span></div><a  class="wrap_close" id="wrapClose">x</a></div>   <div class="wrap_body" id="wrapBody"> </div></div></div>';
+					$("body").append(wrap);	
+					setIntroBg();						
+					var loading='<div id="loading_div" style="display:block;margin:auto;position: absolute;top: 40%;left: 0%;height: 25%;width: 100%;text-align: center;line-height: 0;"><img src="../pictures/lightbox-ico-loading.gif" /></div>';
+					var wrapBody=$("#wrapBody");								
+					var wrapOut = $("#wrapOut");					
+					var wrapClose=$("#wrapClose");
+					param.person.appendTo(wrapBody);					
+					wrapOut.css("width","80px").css("height","40px");
+					$(loading).appendTo(wrapBody);	
+					setBgTitle(title);
+					spreadWidth(wrapOut );
+					spreadHieght(wrapOut );					
+						wrapOut.unbind("click");
+						wrapOut.click(function(event){
+								event.stopPropagation();											
+						});
+						wrapClose.unbind("click");
+						wrapClose.click(function(event){
+							closeBox();		
+							event.stopPropagation();							
+						});
+				}
+				$("#us_photo_div ul li a").click(function(event){
+						var id="#"+$(this).attr("name");
+						param.person=$(id);
+						showInfo($(this).attr("title"));
+						event.stopPropagation();					
+				});	
+				$(".message_to_us_area").keyup(function(e){
+					var currKey=0,
+					e=e||event;
+					currKey=e.keyCode||e.which||e.charCode;
+					if(currKey==13)
+					{
+						
+					}
+				});	
+				$(window).resize(function(){
+					if(param.timeOut!=undefined)
+					{
+						clearTimeout(param.timeOut);
+					}
+					if($("#zxxBlank").length>0)
+					{
+						param.timeOut= setTimeout(function(){setIntroPosition();setIntroBg();},200);
+					}
+				});	
+				$(window).scroll(function(){
+					if(param.timeOut!=undefined)
+					{
+						clearTimeout(param.timeOut);
+					}
+					if($("#zxxBlank").length>0)
+					{
+						param.timeOut= setTimeout(function(){setIntroPosition();setIntroBg();},200);
+					}
+				});	
+
+			});
+			
+			
+			
+		</script>
+<!-- 	<div id="footer_div"  class="footer_div">
+			<ul>
+		                    <li>COPYRIGHT @ 2011 TOPNCrew ALL RIGHTS RESERVED</li>
+			</ul>
+	</div>	 -->
+</body>
+</html>

@@ -1,0 +1,41 @@
+LoadModule jk_module modules/mod_jk-1.2.31-httpd-2.2.3.so
+
+JkWorkersFile conf/workers.properties
+JkMountFile conf/uriworkermap.properties
+JkLogFile logs/mod_jk.log
+JkLogLevel warn
+JkLogStampFormat "[%a %b %d %H:%M:%S %Y]"
+JkOptions +ForwardKeySize +ForwardURICompat -ForwardDirectories
+JkRequestLogFormat "%w %V %U %s %T %B %H %m"
+
+
+
+<VirtualHost *:80>
+    ServerAdmin localhost
+    DocumentRoot "E:/program/staticfile"
+    ServerName   localhost
+    ErrorLog "logs/touchingu-error.log"
+    CustomLog "logs/touchingu-access.log" common
+    
+      JkMount /* controller
+      JkUnmount /*.jpg controller
+      JkUnmount /*.css controller
+      JkUnMount /*.gif controller   
+      JkUnMount /*.png controller   
+      JkUnmount /*.js controller
+      JkUnmount /*.html controller
+      JkUnmount /*.htm controller
+      JkUnmount /*.shtml controller
+      JkUnmount /*.swf controller
+      JkUnmount /*.flv controller
+      JkUnmount /*.xml controller
+      JkUnmount /*.ico controller
+    
+     
+	 <Directory "E:/program/staticfile">
+          Options FollowSymLinks
+          AllowOverride None
+          Order allow,deny
+          Allow from all
+     </Directory>
+</VirtualHost>

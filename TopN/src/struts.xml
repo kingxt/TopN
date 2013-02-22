@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="GBK"?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+<!--    <package name="lee" extends="struts-default">-->
+<!--        <action name="login">-->
+<!--            <result name="input">/login.jsp</result>-->
+<!--            <result name="error">/error.jsp</result>-->
+<!--            <result name="success">/welcome.jsp</result>        -->
+<!--            -->
+<!--        </action>-->
+<!--    </package>-->
+		<constant name="struts.i18n.encoding" value="UTF-8"/>
+		
+		<package name="global" namespace="" abstract="true" extends="struts-default">
+			
+			<interceptors>
+				<interceptor name="authority" class="com.topn.struts2.interceptor.LoginInterceptor"/>
+				<interceptor-stack name="topn-default">
+					<interceptor-ref name="defaultStack"/>
+					<interceptor-ref name="authority"/>
+				</interceptor-stack>
+			</interceptors>		
+			<default-interceptor-ref name="topn-default"/>
+			<default-action-ref name="notFound" />
+			<global-results>
+				<result name="login" type="redirect">/page/util/relogin.jsp</result>
+				<result name="loginerror">/page/login.jsp</result>
+				<result name="nullcookie" type="redirect">/page/login.jsp</result>
+				<result name="nullIdLogin" type="redirect">/page/login.jsp</result>
+				<result name="illigalAccess" type="redirect">/page/login.jsp</result>
+				<result name="register">/page/regist.jsp</result>
+				<result name="nullPoint">/page/util/error.jsp</result>
+			</global-results>
+			
+			<global-exception-mappings>
+				<exception-mapping result="nullPoint" exception="java.lang.NullPointerException"></exception-mapping>
+			</global-exception-mappings>
+			
+		    <action name="notFound">
+		    	<result>/page/login.jsp</result>
+		    </action>
+		    <action name="exit" class="com.topn.action.LoginAction" method="exit">
+				<result name="login" type="redirect">/page/login.jsp</result>
+			</action>
+		</package>
+		
+		<package name="topn_global_json" abstract="true" extends="struts-default">
+			<result-types>
+            	<result-type name="json" class="org.apache.struts2.json.JSONResult"/>
+        	</result-types>
+	        <interceptors>
+	            <interceptor name="json" class="org.apache.struts2.json.JSONInterceptor"/>
+	            <interceptor name="authority" class="com.topn.struts2.interceptor.LoginInterceptor"/>
+				<interceptor-stack name="topn-json-default">
+					<interceptor-ref name="defaultStack"/>
+					<interceptor-ref name="authority"/>
+					<interceptor-ref name="json"/>
+				</interceptor-stack>
+	        </interceptors>
+	        <default-interceptor-ref name="topn-json-default"/>
+		</package>
+		
+		<include file="zx.xml"></include>
+		<include file="kingxt.xml"></include>
+</struts>

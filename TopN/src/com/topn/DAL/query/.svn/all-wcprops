@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/svn/!svn/ver/1159/TopN/src/com/topn/DAL/query
+END
+CDDQuery.java
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/!svn/ver/1298/TopN/src/com/topn/DAL/query/CDDQuery.java
+END
+PersonalInfoQuery.java
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/!svn/ver/1298/TopN/src/com/topn/DAL/query/PersonalInfoQuery.java
+END
+EntryFormQuery.java
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/!svn/ver/1298/TopN/src/com/topn/DAL/query/EntryFormQuery.java
+END
+FriendQuery.java
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/!svn/ver/1298/TopN/src/com/topn/DAL/query/FriendQuery.java
+END

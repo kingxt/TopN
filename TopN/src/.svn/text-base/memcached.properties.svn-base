@@ -1,0 +1,75 @@
+############################################################ 
+## list of cache server, e.g: "memcached-1.nms:11211,memcached-2.nms:11211" 
+## memcached1.nms & memcached2.nms are host names here, they should be configuired in /etc/hosts 
+memcached.servers=localhost:11211
+
+memcached.poolName=kingxt
+
+## Sets the list of weights to apply to the server list. 
+## This is an int array with each element corresponding to an element 
+## in the same position in the server String array. 
+memcached.weights=3
+
+############################################################ 
+## Sets the failover flag for the pool. 
+## If this flag is set to true, and a socket fails to connect, 
+## the pool will attempt to return a socket from another server if one exists. 
+## If set to false, then getting a socket will return null if it fails to connect to the requested server. 
+memcached.failover=true
+
+## Sets the failback flag for the pool. 
+## If this is true and we have marked a host as dead, 
+## will try to bring it back. If it is false, we will never 
+## try to resurrect a dead host. 
+memcached.failback=true
+
+############################################################ 
+## Sets the initial number of connections per server in the available pool. 
+memcached.initConn=1
+
+## Sets the minimum number of spare connections to maintain in our available pool. 
+memcached.minConn=1
+
+## Sets the maximum number of spare connections allowed in our available pool. 
+memcached.maxConn=10
+
+## maintenance thread sleep time 
+memcached.maintSleep=30
+
+## default timeout of socket reads 
+memcached.socketTO=30000
+
+## default to not check each connection for being alive 
+memcached.aliveCheck=false
+
+## enable/disable Nagle's algorithm 
+memcached.nagle=false
+
+## Enable storing compressed data, provided it meets the threshold requirements. 
+## If enabled, data will be stored in compressed form if it is 
+## longer than the threshold length set with setCompressThreshold(int) 
+## The default is that compression is enabled. 
+## Even if compression is disabled, compressed data will be automatically decompressed. 
+memcached.compressEnable=false
+#memcached.region.[regionName].compressEnable to spec for the named cache 
+
+## Sets the required length for data to be considered for compression. 
+## If the length of the data to be stored is not equal or larger than this value, it will 
+## not be compressed. 
+## This defaults to 15 KB(30720). 
+memcached.compressThreshold=30720
+#memcached.region.[regionName].compressThreshold to spec for the named cache 
+
+## 
+memcached.expireTime=15m
+#memcached.region.[regionName].memcached.expireTime to spec for the named cache 
+
+################################################### 
+## region cacha conf followed: 
+
+
+#config the user in memcache, that is to say, the online user will be kicked after an hour later
+memcached.region.online_user.expireTime = 1h
+
+#cache the find user from database
+memcached.region.user.expireTime = 1h

@@ -1,0 +1,99 @@
+package com.topn.controller;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
+
+import com.topn.DAL.PhotoInfoDAL;
+import com.topn.bean.Photo;
+import com.topn.bean.TO.AlbumPhotosTO;
+import com.topn.util.LoggerUtil;
+
+/**
+ * 创建人 youxishow
+ * 创建时间 2011-3-31 下午07:27:31
+ * 照片处理控制层
+ */
+public class PhotoController {
+	
+	private static PhotoController instance=new PhotoController();
+	private static Logger logger = Logger.getLogger(PhotoController.class);
+	
+	public static PhotoController getInstance()
+	{
+		return instance;
+	}
+
+	
+
+	
+
+	/**
+	 * 上传照片
+	 * 
+	 * @param files
+	 * @param filesFileName
+	 * @param personId
+	 * @param albumId
+	 * @return
+	 */
+	public boolean uploadPhoto(List<File> files, List<String> filesFileName,
+			int personId, int albumId) {
+		
+		boolean result=false;
+		Calendar c=Calendar.getInstance();	
+		int mouth=c.get(Calendar.MONTH)+1;
+		String strDate= c.get(Calendar.YEAR)+"-"+mouth;
+		List<Photo> photos=new ArrayList<Photo>();
+<<<<<<< .mine
+		String folderName = "E:/"+"/program/"+"/staticfile/"+"/TopN/"+"/user_picture/"+"/"+strDate+"/"+"/"+"ordinary";
+		//String folderName = "../user_picture/"+strDate+"/ordinary";
+=======
+		//String folderName = "E:\\"+"\\program\\"+"\\staticfile\\"+"\\TopN\\"+"\\user_picture\\"+"\\strDate\\"+"\\"+"ordinary";
+		String folderName = "user_picture/"+strDate+"/ordinary";
+>>>>>>> .r357
+		
+		PhotoInfoDAL pid=PhotoInfoDAL.getInstance();
+		for (int i = 0; i < files.size(); i++) {
+			File photo = files.get(i);
+			String fileName = filesFileName.get(i);
+
+			int position = fileName.lastIndexOf(".");
+			String extension = fileName.substring(position);
+
+			String newName = java.util.UUID.randomUUID().toString() + "."
+					+ extension;
+			File f = new File(folderName, newName);
+				
+			try {
+				FileUtils.copyFile(photo, f);
+				Photo p=new Photo();
+				p.setUrl(folderName+"/"+newName);
+				p.setAlbumId(albumId);
+				photos.add(p);
+				
+			} catch (IOException e) {
+				pid.upload(photos,personId,albumId);
+				LoggerUtil.loggerDebug(logger,
+				"上传图片遇到错误");
+				e.printStackTrace();	
+			}
+		}
+		result=pid.upload(photos,personId,albumId);
+
+		return result;
+	}
+	
+	public AlbumPhotosTO loadAlbumPhotos(int personalId, int albumId, int pageNum,int isEntry)
+	{
+		PhotoInfoDAL pid=PhotoInfoDAL.getInstance();
+		AlbumPhotosTO ap=pid.loadAlbumPhotos(personalId, albumId, pageNum, isEntry);
+		
+		return ap;
+	}
+}

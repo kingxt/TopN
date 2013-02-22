@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+
+	<package name="kingxt" extends="global" namespace="/">
+		<!-- 登录用的 -->
+		<action name="login" class="com.topn.action.LoginAction"
+			method="login">
+			<result name="success">/page/topn.jsp</result>
+		</action>
+
+	</package>
+
+	<!--访问page目录下的页面  -->
+	<package name="page" extends="global" namespace="/page">
+
+		
+
+		<action name="personalPage" class="com.topn.action.PersonalAction"
+			method="toHomePage">
+			<result name="success">/page/personal_page.jsp</result>
+		</action>
+
+		<action name="showBaseInfo" class="com.topn.action.PersonalAction"
+			method="showBaseInfo">
+			<result name="success">/page/personal/show_personal_info.jsp</result>
+		</action>
+
+		<action name="updateBaseInfoInput" class="com.topn.action.PersonalAction"
+			method="updateBaseInfoInput">
+			<result name="success">/page/update_info.jsp</result>
+		</action>
+
+		<action name="updatePersonalInfo" class="com.topn.action.PersonalAction"
+			method="updatePersonalInfo">
+			<result type="redirectAction">showBaseInfo</result>
+		</action>
+
+		<action name="loadHobbyType" class="com.topn.action.HobbyAndHobbyTypeAction"
+			method="initFace">
+			<result name="success">/page/personal/hobby_type.jsp</result>
+		</action>
+
+		<action name="loadHobby" class="com.topn.action.HobbyAndHobbyTypeAction"
+			method="loadHobby">
+			<result name="success">/page/personal/hobby.jsp</result>
+		</action>
+
+		<action name="loadPersonalAlbum" class="com.topn.action.AlbumAction"
+			method="loadPersonalAlbum">
+			<result name="success">/page/personal_album.jsp</result>
+		</action>
+
+		<action name="loadAlbumPhotos" class="com.topn.action.PhotoAction"
+			method="loadAlbumPhotos">
+
+			<result  name="success" >/page/photos.jsp</result>
+		</action>
+
+		<action name="loadUploadPhoto" class="com.topn.action.AlbumAction"
+			method="loadUploadPhoto">
+			<result name="success">/page/upload_pictures.jsp</result>
+		</action>
+
+		<action name="loadEducation" class="com.topn.action.EducationAction"
+			method="loadEducation">
+			<result name="success">/page/personal/education.jsp</result>
+		</action>
+
+		<action name="updateEducation" class="com.topn.action.EducationAction"
+			method="updateSchool">
+			<result type="redirectAction">showBaseInfo</result>
+		</action>
+<<<<<<< .mine
+		
+		<action name="updateHobby" class="com.topn.action.HobbyAndHobbyTypeAction" method="updateHobby">
+			<result type="redirectAction">showBaseInfo</result>
+		</action>
+		
+=======
+	
+>>>>>>> .r471
+		<action name="loadUniversity" class="com.topn.action.EducationAction"
+			method="loadUniversityByProvinceId">
+			<result name="success">/page/personal/university.jsp</result>
+		</action>
+		
+		<action name="loadUploadHeadPortrait" class="com.topn.action.PhotoAction"
+		 	method="loadUploadHeadPortrait">
+			<result name="success">/page/personal/upload_headPortrait.jsp</result>
+		</action>
+
+		<!-- 處理搜索业务 -->
+		<action name="friendSearch" class="com.topn.action.FriendAction"
+			method="friendSearch">
+			<result name="success">/page/personal/friend_search.jsp</result>
+		</action>
+		<action name="searchFriend" class="com.topn.action.FriendAction" method="searchFriend">
+			<result name="success">/page/personal/search_result.jsp</result>
+		</action>
+
+		
+
+		<!-- 访问别人的主页 -->
+		<action name="visitor" class="com.topn.action.VisitorAction"
+			method="visitOther">
+			<result name="success">/page/homepage.jsp</result>
+		</action>
+		
+		<!-- 访问心情 -->
+		<action name="loadMainMood" class="com.topn.action.FriendAction" method="loadMainMood">
+			<result name="success">/page/mood.jsp</result>
+		</action>
+		
+	</package>
+
+	<package name="kingxt_json" extends="json-default">
+		<!-- 获取验证码，利用json方式 -->
+		<action name="getCode" class="com.topn.action.RegisterAction"
+			method="getCode">
+			<result type="json" name="success">
+				<!-- root的值对应要返回的值的属性 -->
+				<!-- 这里的result值即是 对应action中的 result -->
+				<param name="root">result</param>
+			</result>
+			<result type="redirectAction" name="personalPage">
+				personalPage?personalInfoId=${result}
+            </result>
+		</action>
+
+		<!-- 注册用的 -->
+		<action name="register" class="com.topn.action.RegisterAction"
+			method="register">
+			<result type="json">
+				<!-- root的值对应要返回的值的属性 -->
+				<!-- 这里的result值即是 对应action中的 result -->
+				<param name="root">result</param>
+			</result>
+		</action>
+		
+		<!-- 处理好友业务 -->
+		<action name="addFriend" class="com.topn.action.FriendAction" method="addFriend">
+			<result type="json">
+				<!-- root的值对应要返回的值的属性 -->
+				<!-- 这里的result值即是 对应action中的 result -->
+				<param name="root">msg</param>
+			</result>
+		</action>
+		
+		<action name="publishMood" class="com.topn.action.FriendAction" method="publishMood">
+			<result type="json">
+				<!-- root的值对应要返回的值的属性 -->
+				<!-- 这里的result值即是 对应action中的 result -->
+				<param name="root">msg</param>
+			</result>
+		</action>
+		<action name="searchCount" class="com.topn.action.FriendAction" method="searchCount">
+			<result type="json">
+				<!-- root的值对应要返回的值的属性 -->
+				<!-- 这里的result值即是 对应action中的 result -->
+				<param name="root">msg</param>
+			</result>
+		</action>
+	</package>
+</struts>

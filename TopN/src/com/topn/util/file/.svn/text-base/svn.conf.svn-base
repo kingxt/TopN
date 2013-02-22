@@ -1,0 +1,16 @@
+LoadModule dav_fs_module modules/mod_dav_fs.so
+LoadModule dav_module modules/mod_dav.so
+
+LoadModule dav_svn_module modules/mod_dav_svn.so
+LoadModule authz_svn_module modules/mod_authz_svn.so
+
+
+<Location /svn> 
+	DAV svn
+	SVNPath D:/svn/Reporsitory
+	AuthType Basic
+	AuthName "Subversion Reporsitory"
+	AuthUserFile D:/svn/priority/passwd
+	AuthzSVNAccessFile D:/svn/priority/authz
+	Require valid-user 
+</Location>

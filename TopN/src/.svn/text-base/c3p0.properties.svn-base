@@ -1,0 +1,14 @@
+#jdbc.driverClass=com.mysql.jdbc.Driver
+#jdbc.jdbcUrl=jdbc:mysql://124.232.163.53:2100/topn
+#jdbc.user=root
+#jdbc.password=topn@topn
+
+#jdbc.driverClass=com.mysql.jdbc.Driver
+#jdbc.jdbcUrl=jdbc:mysql://58.194.70.125:3306/topn
+#jdbc.user=topn
+#jdbc.password=topn
+
+jdbc.driverClass=com.mysql.jdbc.Driver
+jdbc.jdbcUrl=jdbc:mysql://localhost:3306/topn
+jdbc.user=root
+jdbc.password=root

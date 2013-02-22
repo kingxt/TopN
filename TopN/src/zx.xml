@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="GBK"?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+
+	<package name="json" extends="json-default" namespace="/page">
+		<action name="personalBasicInfo" class="com.topn.action.PersonalAction"
+			method="getPersonalBasicInfo">
+			<result type="json">
+				<param name="personInfo">personInfo</param>
+			</result>
+		</action>
+		
+		<action name="createAlbum" class="com.topn.action.AlbumAction" method="createAlbum">
+			<result type="json">
+				<param name="includeProperties">newAlbum</param>
+		
+			</result>
+		</action>
+		<action name="uploadTempPhoto" class="com.topn.action.PhotoAction"
+			method="uploadTempPhoto">
+			<result type="json">
+				<param name="includeProperties">imgInfo</param>
+				<param name="contentType">text/html</param> 
+			</result>
+			<result name="input" type="json" >
+				<param name="includeProperties">imgInfo</param>
+				<param name="contentType">text/html</param> 
+			</result>
+		</action>
+		
+		<action name="cutHeadPortrait" class="com.topn.action.PhotoAction"
+			method="cutHeadPortrait">
+			<result type="json">
+				<param name="includeProperties">newPhotoChar</param>
+				
+			</result>
+		</action>
+		<action name="cutCompetition" class="com.topn.action.PhotoAction"
+		 	method="cutCompetition">
+			<result type="json">
+				<param name="includeProperties">newPhotoChar</param>
+			</result>
+		</action>
+		<action name="cutCompetitionPictuer" class="com.topn.action.PhotoAction"
+			method="cutCompetitionPictuer">
+			<result type="json">
+				<param name="includeProperties">imgUrl</param>
+			
+			</result>
+		</action>
+		
+		<action name="movePhotos" class="com.topn.action.PhotoAction"
+			method="movePhotos">
+			<result type="json">
+				<param name="includeProperties">resultTotal</param>
+				
+			</result>
+		</action>
+		<action name="deletePhotos" class="com.topn.action.PhotoAction"
+			method="deletePhotos">
+			<result type="json">
+				<param name="includeProperties">resultTotal</param>
+			</result>
+		</action>
+		
+		<action name="updateAlbumCover" class="com.topn.action.AlbumAction"
+			method="updateAlbumCover">
+			<result type="json">
+					<param name="includeProperties">result</param>
+			</result>
+		</action>
+		
+		<action name="updateAlbum" class="com.topn.action.AlbumAction" method="updateAlbum">		
+			<result type='json'>
+				<param name="includeProperties">result</param>
+			</result>		
+		</action>
+		<action name="deleteAlbum" class="com.topn.action.AlbumAction"
+			method="deleteAlbum">
+		<result type='json'>
+				<param name="includeProperties">result</param>
+		</result>	
+	
+		</action>
+		
+		<action name="cutHeadportrait" class="com.topn.action.PhotoAction" 
+		method="cutHeadportrait">
+			<result type='json'>
+				<param name="includeProperties">result</param>
+				<param name="contentType">text/html</param> 
+		</result>	
+		</action>
+	</package>
+	<constant name="struts.multipart.saveDir" value="D:\program\staticfile\TopN\temp"/>
+	<constant name="struts.multipart.maxSize" value="2621440" />
+	<package name="struts2" extends="struts-default" namespace="/page">
+				      	
+			<action name="uploadPhoto" class="com.topn.action.PhotoAction" method="uploadPhoto" >
+				<result name="success" >upload_pictures.jsp</result>
+			<interceptor-ref name="defaultStack"></interceptor-ref>
+			</action>
+			
+			<action name="loadPicManage" class="com.topn.action.PhotoAction"
+			method="loadPicManage">
+			<result name="success">pic_manage.jsp</result>
+		</action>
+		
+		<action name="loadCompetitionPictuer" class="com.topn.action.PhotoAction"
+		method="loadCompetitionPictuer">
+			<result name="success">competition_pictuer.jsp</result>
+		</action>		
+		
+		
+	</package>
+</struts>

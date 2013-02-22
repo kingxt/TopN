@@ -1,0 +1,182 @@
+package com.topn.action;
+
+import javax.servlet.http.Cookie;
+
+import net.sf.json.JSONObject;
+
+import org.apache.log4j.Logger;
+import org.apache.struts2.ServletActionContext;
+
+import com.opensymphony.xwork2.ActionContext;
+import com.opensymphony.xwork2.ActionSupport;
+import com.topn.DAL.query.PersonalInfoQuery;
+import com.topn.bean.PersonalInfo;
+import com.topn.bean.TO.PermissionsTO;
+import com.topn.cache.MemCache;
+import com.topn.cache.MemCacheProvider;
+import com.topn.collection.UserInRegister;
+import com.topn.exception.ServiceException;
+import com.topn.util.GenerateSql;
+import com.topn.util.LoggerUtil;
+
+/**
+ * 创建人 youxishow 创建时间 2011-3-17 下午11:23:05 个人信息页面交互ACTION
+ */
+public class PersonalAction extends ActionSupport {
+
+	private static Logger logger = Logger.getLogger(PersonalAction.class);
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	// 用户基本信息 JSON类型
+	private String personInfo;
+
+
+	private PersonalInfo pi;
+	private PermissionsTO per;
+	
+	private int personalInfoId;
+	
+	public String getPersonInfo() {
+		return personInfo;
+	}
+
+	public void setPersonInfo(String personInfo) {
+		this.personInfo = personInfo;
+	}
+
+	public String toHomePage() {
+		return SUCCESS;
+	}
+
+	/**
+	 * 从缓存中获取用户的基本信息
+	 * 
+	 * @return json类型的用户信息
+	 */
+	public String getPersonalBasicInfo() {
+		Cookie[] cookies = ServletActionContext.getRequest().getCookies();
+		String personId = "";
+		for (Cookie c : cookies) {
+			if (c.getName().equals("id")) {
+				personId = c.getValue();
+				break;
+			}
+		}
+		MemCache mc = MemCacheProvider.getInstance().buildCache(
+				MemCacheProvider.MEMCACHE_TYPE_USER);
+		PersonalInfo pi = (PersonalInfo) mc.get(personId);
+		JSONObject jb = JSONObject.fromObject(pi);
+		personInfo = jb.toString();
+
+		return SUCCESS;
+	}
+
+	public String getPersonalAlbum()
+	{
+		
+		return SUCCESS;
+	}
+	/**
+	 * 更新用户信息，这里首先应该是查出数据
+	 * @return
+	 */
+	public String updateBaseInfo(){
+		//首先显示给用户基本信息
+		Cookie [] cookies=ServletActionContext.getRequest().getCookies();
+		int pId = 0;
+		for(Cookie c:cookies)
+		{
+			if(c.getName().equals("id"))
+			{
+				pId = Integer.parseInt(c.getValue());
+				break;
+			}
+		}
+		PersonalInfo pi = PersonalInfoQuery.getInstance().getPersonById(pId);
+		ActionContext.getContext().put("pi", pi);
+		return SUCCESS;
+	}
+	
+	/**
+	 * 更新输入操作
+	 * @return
+	 */
+	public String updateBaseInfoInput(){
+		Cookie [] cookies=ServletActionContext.getRequest().getCookies();
+		int pId = 0;
+		for(Cookie c:cookies)
+		{
+			if(c.getName().equals("id"))
+			{
+				pId = Integer.parseInt(c.getValue());
+				break;
+			}
+		}
+		PersonalInfo pi = PersonalInfoQuery.getInstance().getPersonById(pId);
+		ActionContext.getContext().put("pi", pi);
+		ActionContext.getContext().put("per", PermissionsTO.string2PermissionsTO(pi.getPermission()));
+		return SUCCESS;
+	}
+	
+	public String updatePersonalInfo(){
+		try {
+			Cookie [] cookies=ServletActionContext.getRequest().getCookies();
+			for(Cookie c:cookies)
+			{
+				if(c.getName().equals("id"))
+				{
+					int pId = Integer.parseInt(c.getValue());
+					pi.setPersonalInfoId(pId);
+				}else if(c.getName().equals("username")){
+					pi.setTableName(UserInRegister.getTableName(c.getValue()));
+				}
+			}
+			pi.setPermission(PermissionsTO.permission2String(per));
+			String sql = GenerateSql.generateUpdateSql(pi);
+			if(null != sql){ 
+				PersonalInfoQuery.getInstance().updatePerson(sql);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			LoggerUtil.loggerDebug(logger, "[PersonalAction, updatePersonalInfo]更新异常");
+			throw new ServiceException("更新异常");			
+		}
+		return SUCCESS;
+	}
+
+	public String loadPersonlAlbum()
+	{
+		
+		return SUCCESS;
+	}
+	
+	public void setPersonalInfoId(int personalInfoId) {
+		this.personalInfoId = personalInfoId;
+	}
+
+	public void setPi(PersonalInfo pi) {
+		this.pi = pi;
+	}
+	
+
+	public PersonalInfo getPi() {
+		return pi;
+	}
+
+	public PermissionsTO getPer() {
+		return per;
+	}
+
+	public int getPersonalInfoId() {
+		return personalInfoId;
+	}
+
+	public void setPer(PermissionsTO per) {
+		this.per = per;
+	}
+	
+	
+}

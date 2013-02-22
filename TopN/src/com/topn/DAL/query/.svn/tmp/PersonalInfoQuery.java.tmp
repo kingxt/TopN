@@ -1,0 +1,260 @@
+package com.topn.DAL.query;
+
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+
+import com.topn.bean.Album;
+import com.topn.bean.PersonalInfo;
+import com.topn.bean.TO.CacheRankPersonTO;
+import com.topn.bean.TO.LoginTO;
+import com.topn.cache.MemCache;
+import com.topn.cache.MemCacheProvider;
+import com.topn.cache.UserCache;
+import com.topn.util.ConnectionManager;
+import com.topn.util.LoggerUtil;
+import com.topn.util.SqlExecuteUtil;
+
+/**
+ * 
+ * 创建人 KingXt 创建时间：2011-3-7 下午05:26:41
+ * 
+ * 个人信息查询
+ */
+public class PersonalInfoQuery extends BaseQueryDAL {
+
+	private static Logger logger = Logger.getLogger(PersonalInfoQuery.class);
+
+	private static PersonalInfoQuery piq = new PersonalInfoQuery();
+	private static MemCache mc = MemCacheProvider.getInstance().buildCache(
+			MemCacheProvider.MEMCACHE_TYPE_USER);
+	private static String loginProcedure = "sp_login";
+	// 存储过程，按照id查询
+	public static final String SP_PERSON_INFO_SELECTBY_ONLYID = "sp_person_info_selectby_onlyid";
+	
+	// 存储过程，按照id查询该用户的相册
+	public static final String SP_ALBUM_SELECTBY_PID="sp_album_selectby_pid";
+
+	public PersonalInfoQuery() {
+	}
+
+	public static PersonalInfoQuery getInstance() {
+		return piq;
+	}
+
+	/**
+	 * 根据用户名查询
+	 * 
+	 * @param username
+	 */
+	public LoginTO queryWithUsername(String tableName, String username,
+			String password) {
+		Connection conn = ConnectionManager.getInstance().getConnection();
+		/*
+		 * ？参数列表【是否成功的登录; 表名称， 用户名，密码; 照片是否审核成功， 总次数， 总分数， 姓名， 评论照片url， 用户id】
+		 */
+		String procedure = "{call " + loginProcedure
+				+ "(?, ?, ?, ?, ?, ?, ?, ? ,?, ?, ?)}";
+		CallableStatement stmt = null;
+		LoginTO lto = null;
+		int id = 0;
+		int flag = 0;
+		try {
+			stmt = conn.prepareCall(procedure);
+
+			stmt.setString(1, tableName);
+			stmt.setString(2, username);
+			stmt.setString(3, password);
+
+			stmt.registerOutParameter(4, Types.TINYINT);
+			stmt.registerOutParameter(5, Types.VARCHAR);
+			stmt.registerOutParameter(6, Types.VARCHAR);
+			stmt.registerOutParameter(7, Types.INTEGER);
+			stmt.registerOutParameter(8, Types.FLOAT);
+			stmt.registerOutParameter(9, Types.TINYINT);
+			stmt.registerOutParameter(10, Types.INTEGER);
+			stmt.registerOutParameter(11, Types.INTEGER);
+			stmt.execute();
+			id = stmt.getInt(11);
+			flag = stmt.getInt(4);
+		} catch (SQLException e1) {
+			LoggerUtil.loggerDebug(logger,
+					"[PersonalInfoDAL， regiser] 类中执行存储过程[" + loginProcedure
+							+ "]失败" + e1.getMessage());
+			e1.printStackTrace();
+		}
+		if (flag != 1) {
+			lto = new LoginTO();
+			PersonalInfo pi = new PersonalInfo();
+			try {
+				lto.setName(stmt.getString(5));
+				pi.setName(lto.getName());
+
+				lto.setImageURL(stmt.getString(6));
+				pi.setPhone(lto.getImageURL());
+
+				lto.setTimes(stmt.getInt(7));
+
+				lto.setTotalScore(stmt.getFloat(8));
+				lto.setPersonalInfoId(id);
+
+				int isChecked = stmt.getInt(9);
+				switch (isChecked) {
+				case 1:
+					lto.setAttention(LoginTO.CHECK_ING);
+					break;
+				case 2:
+					lto.setAttention(LoginTO.CHECK_FAIL);
+					break;
+				}
+				lto.setSex(stmt.getInt(10));
+
+				pi.setPersonalInfoId(id);
+			} catch (SQLException e) {
+				e.printStackTrace();
+				LoggerUtil.loggerDebug(logger,
+						"[PersonalInfoDAL， regiser] 类中执行存储过程[" + loginProcedure
+								+ "]失败, 获取信息失败" + e.getMessage());
+			}
+			// 缓存刚查出的用户的id(memcache级别缓存)
+			// memcache缓存
+			mc.put(id, pi);
+			// jvm级别缓存
+			UserCache.getInstance().add(id, username);
+		}
+		SqlExecuteUtil.closeCallableStatement(stmt);
+		SqlExecuteUtil.closeConnection(conn);
+		return lto;
+	}
+
+	/**
+	 * 返回别人进去的主页
+	 * @param id
+	 * @return
+	 */
+	public CacheRankPersonTO getCacheRankPersonTOById(int id){
+		Connection conn = ConnectionManager.getInstance().getConnection();
+		//第一步就是查询基本信息
+		String procedure = "{call " +SP_PERSON_INFO_SELECTBY_ONLYID +"(?)}";
+		CallableStatement stmt = null;
+		CacheRankPersonTO crp = new CacheRankPersonTO();
+		PersonalInfo pi = new PersonalInfo();
+		try {
+			stmt = conn.prepareCall(procedure);
+			stmt.setInt(1, id);
+			ResultSet rs = stmt.executeQuery();
+			if(rs.next()){
+				pi.setSex(rs.getInt(1));
+				pi.setNickName(rs.getString(2));
+				pi.setJob(rs.getString(3));
+				pi.setPs(rs.getString(4));
+				pi.setPhoto(rs.getString(5));
+				pi.setBirthday(rs.getDate(6));
+				pi.setPhone(rs.getString(7));
+				pi.setAddress(rs.getString(8));
+				pi.setMsn(rs.getString(9));
+				pi.setQq(rs.getString(10));
+				pi.setSchool(rs.getString(11));
+				pi.setHobby(rs.getString(12));
+				pi.setOtherHobby(rs.getString(13));
+				pi.setPermission(rs.getString(14));
+			}
+			crp.setPi(pi);
+		} catch (SQLException e) {
+			LoggerUtil.loggerDebug(logger,
+					"[PersonalInfoDAL， getCacheRankPersonTOById] 类中执行存储过程[" + SP_PERSON_INFO_SELECTBY_ONLYID
+							+ "]失败, 获取信息失败" + e.getMessage());
+			e.printStackTrace();
+		}
+		
+		//第二步是参赛照片记录
+		SqlExecuteUtil.closeCallableStatement(stmt);
+		SqlExecuteUtil.closeConnection(conn);
+		return crp;
+	}
+	
+	/**
+	 * 根据id查询用户
+	 * @param id
+	 * @return
+	 */
+	public PersonalInfo getPersonById(int id){
+		Connection conn = ConnectionManager.getInstance().getConnection();
+		String procedure = "{call " +SP_PERSON_INFO_SELECTBY_ONLYID +"(?)}";
+		CallableStatement stmt = null;
+		PersonalInfo pi = new PersonalInfo();
+		try {
+			stmt = conn.prepareCall(procedure);
+			stmt.setInt(1, id);
+			ResultSet rs = stmt.executeQuery();
+			if(rs.next()){
+				pi.setSex(rs.getInt(1));
+				pi.setNickName(rs.getString(2));
+				pi.setJob(rs.getString(3));
+				pi.setPs(rs.getString(4));
+				pi.setPhoto(rs.getString(5));
+				pi.setBirthday(rs.getDate(6));
+				pi.setPhone(rs.getString(7));
+				pi.setAddress(rs.getString(8));
+				pi.setMsn(rs.getString(9));
+				pi.setQq(rs.getString(10));
+				pi.setSchool(rs.getString(11));
+				pi.setHobby(rs.getString(12));
+				pi.setOtherHobby(rs.getString(13));
+				pi.setPermission(rs.getString(14));
+			}
+		} catch (SQLException e) {
+			LoggerUtil.loggerDebug(logger,
+					"[PersonalInfoDAL， getCacheRankPersonTOById] 类中执行存储过程[" + SP_PERSON_INFO_SELECTBY_ONLYID
+							+ "]失败, 获取信息失败" + e.getMessage());
+			e.printStackTrace();
+		}
+		SqlExecuteUtil.closeCallableStatement(stmt);
+		SqlExecuteUtil.closeConnection(conn);
+		return pi;
+	}
+	
+	
+	
+	public List loadPersonalAlbum(int personalId)
+	{
+		Connection conn = ConnectionManager.getInstance().getConnection();
+		String procedure = "{call " +SP_ALBUM_SELECTBY_PID +"(?)}";
+		CallableStatement stmt = null;
+		List<Album> albums=new ArrayList<Album>();
+		try {
+			stmt = conn.prepareCall(procedure);
+			stmt.setInt(1, personalId);
+			ResultSet rs = stmt.executeQuery();	
+			while(rs.next())
+			{
+				Album a=new Album();
+				a.setAlbumId(rs.getInt("album_id"));
+				a.setOwner(rs.getString("owner"));
+				a.setName(rs.getString("name"));
+				a.setPassword(rs.getString("password"));
+				a.setNeedPwd(rs.getInt("need_pwd"));
+				a.setDetail(rs.getString("detail"));
+				a.setCover(rs.getString("cover"));
+				a.setIsEntry(rs.getInt("is_entry"));
+				albums.add(a);
+			}
+			
+		} catch (SQLException e) {
+			LoggerUtil.loggerDebug(logger,
+					"[PersonalInfoDAL， loadPersonalAlbum] 类中查询失败" + e.getMessage());
+			e.printStackTrace();
+		}
+		SqlExecuteUtil.closeStatement(stmt);
+		SqlExecuteUtil.closeConnection(conn);
+		
+		return albums;
+	}
+}

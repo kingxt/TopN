@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 40
+/svn/!svn/ver/1159/TopN/src/com/topn/DAL
+END
+PersonalInfoDAL.java
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/!svn/ver/1298/TopN/src/com/topn/DAL/PersonalInfoDAL.java
+END
+EntryFormDAL.java
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/!svn/ver/1298/TopN/src/com/topn/DAL/EntryFormDAL.java
+END
+PhotoInfoDAL.java
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/!svn/ver/1298/TopN/src/com/topn/DAL/PhotoInfoDAL.java
+END
+FriendDAL.java
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/!svn/ver/1298/TopN/src/com/topn/DAL/FriendDAL.java
+END
+AlbumInfoDAL.java
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/!svn/ver/1298/TopN/src/com/topn/DAL/AlbumInfoDAL.java
+END

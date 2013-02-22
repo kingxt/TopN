@@ -1,0 +1,7 @@
+#这个参数是设置用户形象照片基路径，注意斜线结束
+user_contraction_picture_relative_path=user_picture/self_picture/
+
+user_contraction_picture_original_wide=640
+user_contraction_picture_original_height=480
+user_contraction_picture_small_wide=60
+user_contraction_picture_small_height=60

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<entry key="profiler.settings.instrument.empty.methods">true</entry>
+<entry key="ProfilerCPUSettings_profile_runnables">true</entry>
+<entry key="ProfilerCPUSettings_filter_type">2</entry>
+<entry key="ProfilerMemorySettings_track_every">10</entry>
+<entry key="ProfilerMemorySettings_mode">4</entry>
+<entry key="ProfilerCPUSettings_root_classes">com.topn.DAL.**
+com.topn.action.**
+com.topn.asynchronous.**
+com.topn.bean.**
+com.topn.cache.**
+com.topn.collection.**
+com.topn.controller.**
+com.topn.exception.**
+com.topn.factory.**
+com.topn.flex.**
+com.topn.manager.**
+com.topn.nl.justobjects.pushlet.core.**
+com.topn.nl.justobjects.pushlet.servlet.**
+com.topn.nl.justobjects.pushlet.util.**
+com.topn.online.**
+com.topn.servlet.filter.**
+com.topn.strategy.**
+com.topn.struts2.interceptor.**
+com.topn.task.**
+com.topn.test.**
+com.topn.util.**
+</entry>
+<entry key="ProfilerCPUSettings_filter_value">com.topn.DAL.*,
+com.topn.action.*,
+com.topn.asynchronous.*,
+com.topn.bean.*,
+com.topn.cache.*,
+com.topn.collection.*,
+com.topn.controller.*,
+com.topn.exception.*,
+com.topn.factory.*,
+com.topn.flex.*,
+com.topn.manager.*,
+com.topn.nl.justobjects.pushlet.core.*,
+com.topn.nl.justobjects.pushlet.servlet.*,
+com.topn.nl.justobjects.pushlet.util.*,
+com.topn.online.*,
+com.topn.servlet.filter.*,
+com.topn.strategy.*,
+com.topn.struts2.interceptor.*,
+com.topn.task.*,
+com.topn.test.*,
+com.topn.util.*</entry>
+<entry key="profiler.settings.istrument.getter.setter.methods">true</entry>
+<entry key="myeclipse.profiling.mode">0</entry>
+<entry key="ProfilerMemorySettings_stacktraces">-1</entry>
+</properties>
